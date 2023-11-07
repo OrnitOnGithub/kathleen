@@ -49,15 +49,15 @@ section .data
 	text db "Hello", 0          
 
 section .bss
-    variable resq 1             ; Reserve space for a 64-bit variable
+    variable resq 1     ; Reserve space for a 64-bit variable
 
 _start:
 	; (in the language) let is used
     ; Initialize the variable with a value
 
     mov qword [variable], text  ; qword = 8 bytes, word = 2 bytes for example.
-    							; To store 2 words for example, we would
-    							; need to use [variable + x]
+                                ; To store 2 words for example, we would
+                                ; need to use [variable + x]
 ```
 
 ## Drop
