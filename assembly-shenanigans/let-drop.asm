@@ -1,36 +1,41 @@
 section .data
-    ; Define a variable to hold the memory address
-    variable_ptr dq 0
+	text db "Hello", 0
+
+section .bss
+    variable resq 1  ; Reserve space for a 64-bit variable
 
 section .text
-global _start
+    global _start
 
 _start:
-    ; Allocate memory for the variable
-    mov rdi, 13         ; Length of the string "Hello, world"
-    mov rax, 0x9       ; syscall number for brk (heap allocation)
-    syscall
-    mov [variable_ptr], rax  ; Store the allocated memory address in variable_ptr
+	; (in the language) let is used
+    ; Initialize the variable with a value
+    mov qword [variable], text  ; qword = 8 bytes, word = 2 bytes for example.
+    							; To store 2 words for example, we would then
+    							; need to use [variable + x]
 
-    ; Copy the string "Hello, world" to the allocated memory
-    mov rdi, rax
-    mov rsi, hello
-    mov rcx, 13
-    rep movsb
-
-
-
-    ; Free the memory (drop the variable)
-
-    mov rax, [variable_ptr]
-    mov rdi, rax
-    mov rax, 0xA       ; syscall number for brk (heap deallocation)
+    ; Print the value
+    mov rax, 1      	; syscall number for sys_write (1)
+    mov rdi, 1      	; File descriptor for stdout (1)
+    mov rsi, [variable] ; Load the address of the format string
+    mov rdx, 6     		; Length of the string
     syscall
 
-    ; Exit the program
-    mov rax, 60         ; syscall number for exit
-    xor rdi, rdi        ; exit status (0)
+	; (in the language) drop is used
+    ; manually deallocate the memory
+    mov rax, 11     ; syscall number for sys_munmap (11)
+    mov rdi, [variable]  ; Pointer to the variable
+    mov rsi, 6 
     syscall
 
-section .data
-hello db "Hello, world", 0
+    ; print the value - this time we get a segfault!
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, [variable]
+    mov rdx, 6
+    syscall
+
+    ; exit the program
+    mov rax, 60 ; syscall number for sys_exit (60)
+    mov rdi, 0  ; return code (0)
+    syscall
