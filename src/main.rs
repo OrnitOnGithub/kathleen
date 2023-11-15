@@ -1,13 +1,17 @@
 use std::fs::read_to_string;
 
-const FILEPATH: &str = "src/mylang.c"; // Later the program should take this as a parameter.
+const FILEPATH: &str = "src/mylang.c"; // Later the compiler should take this as a parameter.
 
 // From now on in comments, "the code" refers to the
 // programming language this compiler compiles for.
 
 fn main() {
 
-    // Create a Vector for each line inside the code.
+    // Create a Vector for each line of the code.
+    //
+    // The only reason we separate lines is for the 
+    // compiler to be able to return a line number when
+    // an error occurs. All we do is return the index + 1.
     let mut lines = Vec::new();
     // Iterate through the lines, add to Vector
     for line in read_to_string(FILEPATH).unwrap().lines() {
