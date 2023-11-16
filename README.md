@@ -6,4 +6,4 @@ For more info check `non-code` directory. That's where the docs and everything e
 
 ## The Goal
 
-The goal is to build a compiler that can turn a custom language into an assembly output.
+The goal is to build a compiler that can turn a custom language into an x86_64 linux nasm assembly output.

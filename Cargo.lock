@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "interpret-compiler-2"
+name = "compiler"
 version = "0.1.0"

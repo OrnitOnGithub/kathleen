@@ -21,8 +21,8 @@ fn main() {
 
     // Tokenise the code by splitting every whitespace character.
     // Store all tokens in a vector
-    // 
     // We get a Vector like this:
+    // 
     //   line 1         line 2
     // [["Hello"], ["hi", "there"]]
     let mut tokenised_lines = Vec::new();
@@ -33,5 +33,38 @@ fn main() {
     println!("tokens: {:?}", tokenised_lines);
 
 
+    
 
+
+}
+
+
+//#[derive(Debug)]
+struct Instruction {
+    instruction_type: Type,
+    parameters: Vec<Instruction>,    
+}
+
+
+//#[derive(Debug)]
+enum Type {
+    StaticData,         // Section .data
+    Main,               // global main \n main:
+
+    Loop,               // Start of the loop
+    LoopJump,           // Jump back to the start of the loop
+    LoopBreak,          // Exit the loop
+    LoopExitPoint,      // Where to go after exiting the loop
+
+    Condition,          // Define the evaluation
+    ConditionTrue,      // Where to go
+    ConditionFalse,
+    ConditionExitPoint, // Where to go after a condition's code.
+
+    Identifier(i32),    // To differentiate between for example jump points.
+                        // Must be incremented after each use
+    List,
+    Int(i32),
+    Float(f32),
+    String(String),
 }
