@@ -35,7 +35,19 @@ fn main() {
     println!("tokens: {:?}", tokenised_lines);
 
 
-    //
+    /// Remove all comments from the code
+    /// Leave blank spaces where there were comments to maintain
+    /// the line count
+    
+    let mut comment: bool = true;
+    for line in tokenised_lines {
+        for keyword in line {
+            // As soon as we meet "//" -> Rest of the line becomes a comment
+            // As soon as we meet "/*" -> Everything beomes a comment until "*/"
+            //                                             |
+            // The "comment" bool is true until  "*/" <----'
+        }
+    }
 
 
 }
