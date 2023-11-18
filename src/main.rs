@@ -8,11 +8,11 @@ const FILEPATH: &str = "src/mylang.c";
 
 fn main() {
 
-    /// Create a Vector for each line of the code.
-    ///
-    /// The only reason we separate lines is for the 
-    /// compiler to be able to return a line number when
-    /// an error occurs. All we do is return the index + 1.
+    // Create a Vector for each line of the code.
+    //
+    // The only reason we separate lines is for the 
+    // compiler to be able to return a line number when
+    // an error occurs. All we do is return the index + 1.
     let mut lines = Vec::new();
     // Iterate through the lines, add to Vector
     for line in read_to_string(FILEPATH).unwrap().lines() {
@@ -20,13 +20,13 @@ fn main() {
     }
 
 
-    /// Tokenise the code by splitting every whitespace character.
-    /// Store all tokens in a vector
-    /// We get a Vector like this:
-    /// ```
-    ///   line 1         line 2
-    /// [["Hello"], ["hi", "there"]]
-    /// ```
+    // Tokenise the code by splitting every whitespace character.
+    // Store all tokens in a vector
+    // We get a Vector like this:
+    // ```
+    //   line 1         line 2
+    // [["Hello"], ["hi", "there"]]
+    // ```
     let mut tokenised_lines = Vec::new();
     for line in lines {
         // Create a new vector with every token
@@ -35,19 +35,27 @@ fn main() {
     println!("tokens: {:?}", tokenised_lines);
 
 
-    /// Remove all comments from the code
-    /// Leave blank spaces where there were comments to maintain
-    /// the line count
+    // Remove all comments from the code
+    // Leave blank spaces where there were comments to maintain
+    // the line count
+    //
+    // CURRENTLY WE ONLY HAVE "//" IMPLEMENTED
+    // As soon as we meet "//" -> Rest of the line becomes a comment
+    // As soon as we meet "/*" -> Everything beomes a comment until "*/"
+    //                                             |
+    // The "comment" bool is true until "*/"  <---'
+    // let mut comment: bool = true;
+    for line_index in 0..tokenised_lines.len() {
+        let line = &mut tokenised_lines[line_index];
     
-    let mut comment: bool = true;
-    for line in tokenised_lines {
-        for keyword in line {
-            // As soon as we meet "//" -> Rest of the line becomes a comment
-            // As soon as we meet "/*" -> Everything beomes a comment until "*/"
-            //                                             |
-            // The "comment" bool is true until  "*/" <----'
+        // Find the index of the first occurrence of "//"
+        if let Some(index) = line.iter().position(|keyword| keyword == "//") {
+            line.truncate(index); // Remove elements from the index to the end
         }
     }
+    
+    println!("commentless tokens: {:?}", tokenised_lines);
+    
 
 
 }
@@ -58,7 +66,7 @@ fn main() {
 /// `inst_type` defines the type of instruction, while `parameters`
 /// contains a vector of additional instructions or arguments
 /// associated with this instruction.
-//#[derive(Debug)]
+// #[derive(Debug)]
 struct Instruction {
     inst_type: Type,
     parameters: Vec<Instruction>,  
@@ -66,7 +74,7 @@ struct Instruction {
 
 /// This Enum enumerates different types of "instructions",
 /// including definitions for sections like `.data`, loop
-/// constructs, conditions, identifiers,
+/// constructs, conditions, functions, identifiers,
 /// constants, and various data types.
 //#[derive(Debug)]
 enum Type {
@@ -75,8 +83,11 @@ enum Type {
 
     Loop,               // Start of the loop
     LoopJump,           // Jump back to the start of the loop
-    LoopBreak,          // Exit the loop
-    LoopExitPoint,      // Where to go after exiting the loop
+    LoopBreak,          // Exit the loop (`break`)
+    LoopExitPoint,      // Where to go after exiting the loop`
+
+    Function,
+    CallFunction,
 
     Condition,          // Define the evaluation
     ConditionTrue,      // Where to go
