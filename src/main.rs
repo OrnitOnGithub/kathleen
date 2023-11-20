@@ -62,14 +62,13 @@ fn main() {
 
 /// Represents an instruction or a set of instructions
 /// in the intermediate representation.
-///
 /// `inst_type` defines the type of instruction, while `parameters`
 /// contains a vector of additional instructions or arguments
 /// associated with this instruction.
 // #[derive(Debug)]
 struct Instruction {
     inst_type: Type,
-    parameters: Vec<Instruction>,  
+    parameters: Vec<Instruction>,
 }
 
 /// This Enum enumerates different types of "instructions",
@@ -81,18 +80,14 @@ enum Type {
     StaticData,         // Section .data
     Main,               // global main \n main:
 
-    Loop,               // Start of the loop
-    LoopJump,           // Jump back to the start of the loop
-    LoopBreak,          // Exit the loop (`break`)
-    LoopExitPoint,      // Where to go after exiting the loop`
-
-    Function,
-    CallFunction,
+    Function,           // The start of the function, OR THE LOOP
+    FunctionCall,       // To call the function OR CALL THE LOOP AGAIN
+    FunctionReturn,     // To exit the function, OR BREAK THE LOOP
 
     Condition,          // Define the evaluation
-    ConditionTrue,      // Where to go
-    ConditionFalse,
-    ConditionExitPoint, // Where to go after a condition's code.
+    ConditionTrue,      // Where to go if TRUE
+    ConditionFalse,     // Where to go if FALSE
+    ConditionExitPoint, // Basically ret, same as function return
 
     Identifier(i32),    // To differentiate between for example jump points.
                         // Must be incremented after each use
