@@ -85,7 +85,7 @@ enum Type {
     FunctionReturn,     // To exit the function, OR BREAK THE LOOP
 
     Condition,          // Define the evaluation
-    ConditionTrue,      // Where to go if TRUE
+    ConditionTrue,      // Where to go if TRUE Basical
     ConditionFalse,     // Where to go if FALSE
     ConditionExitPoint, // Basically ret, same as function return
 
