@@ -1,7 +1,10 @@
-use std::fs::read_to_string;
+use std::{fs::read_to_string, num::IntErrorKind};
 
-// Later the compiler should take this as a parameter.
-const FILEPATH: &str = "src/mylang.c";
+mod tokenizer;  // This is the code for the tokenizer; first step of compilation.
+                // Check tokenizer.rs for more info
+
+// File path - Later the compiler should take this as a parameter.
+const FILEPATH: &str = "mylang.c";
 
 // From now on in comments, "the code" refers to the
 // programming language this compiler compiles for.
@@ -19,44 +22,11 @@ fn main() {
         lines.push(line.to_string());
     }
 
+    // Tokenize (and preprocess) the code. See `tokenize` function
+    // (in tokenizer.rs) for more info
+    let mut tokenized_lines = tokenizer::tokenize(lines);
 
-    // Tokenise the code by splitting every whitespace character.
-    // Store all tokens in a vector
-    // We get a Vector like this:
-    // ```
-    //   line 1         line 2
-    // [["Hello"], ["hi", "there"]]
-    // ```
-    let mut tokenised_lines = Vec::new();
-    for line in lines {
-        // Create a new vector with every token
-        tokenised_lines.push(line.split_whitespace().map(|s| s.to_string()).collect::<Vec<String>>());
-    }
-    println!("tokens: {:?}", tokenised_lines);
-
-
-    // Remove all comments from the code
-    // Leave blank spaces where there were comments to maintain
-    // the line count
-    //
-    // CURRENTLY WE ONLY HAVE "//" IMPLEMENTED
-    // As soon as we meet "//" -> Rest of the line becomes a comment
-    // As soon as we meet "/*" -> Everything beomes a comment until "*/"
-    //                                             |
-    // The "comment" bool is true until "*/"  <---'
-    // let mut comment: bool = true;
-    for line_index in 0..tokenised_lines.len() {
-        let line = &mut tokenised_lines[line_index];
     
-        // Find the index of the first occurrence of "//"
-        if let Some(index) = line.iter().position(|keyword| keyword == "//") {
-            line.truncate(index); // Remove elements from the index to the end
-        }
-    }
-    
-    println!("commentless tokens: {:?}", tokenised_lines);
-    
-
 
 }
 
@@ -80,9 +50,15 @@ enum Type {
     StaticData,         // Section .data
     Main,               // global main \n main:
 
-    Function,           // The start of the function, OR THE LOOP
-    FunctionCall,       // To call the function OR CALL THE LOOP AGAIN
-    FunctionReturn,     // To exit the function, OR BREAK THE LOOP
+    Scope,
+    ScopeExit,
+
+    Function,           // The start of the function
+    FunctionCall,       // To call the function
+    FunctionReturn,     // To exit the function
+
+    Loop,
+    LoopBreak,
 
     Condition,          // Define the evaluation
     ConditionTrue,      // Where to go if TRUE Basical

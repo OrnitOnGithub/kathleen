@@ -1,19 +1,24 @@
-### Brackets
+```rust
 
-```c
-{ // Scope 1
-    { // Scope 2
-        { // Scope 3
-
-        } // Scope 3
-
-        { // Scope 4
-
-        } // Scope 4
-    } // Scope 2
+fn recursive_instruction() -> Instruction {
+    // we can have an if here for example
+    if CONDITION {
+        return Instruction { 
+            inst_type: Type::Scope,
+            parameters: vec![recursive_instruction()],
+        }
+    }
+    else
+    {
+        return Instruction { 
+            inst_type: Type::Scope,
+            parameters: vec![],
+        }
+    }
 }
-{ // Scope 5
-
-} // Scope 5
 ```
 
+idea 1: flawed
+We call the function, the function handles a keyword.
+After this the keyword gets deleted, and the function
+is called recursively as shown above.
