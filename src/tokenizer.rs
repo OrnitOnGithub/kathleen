@@ -5,7 +5,12 @@
 /// - It appends every line (Which is now a vector of tokens) to another vector.
 ///     - The index of the line in this vector is also its line number - 1.
 /// - It removes all comments
-
+/// 
+/// We get an end result like this:
+/// ```
+///  //line 1       //line 2
+/// [["Hello"], ["Hi", "there"]]
+/// ```
 pub fn tokenize(lines: Vec<String>) -> Vec<Vec<String>> {
 
     // Tokenise the code by splitting every whitespace character.
