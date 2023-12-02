@@ -1,8 +1,7 @@
 ```rust
 
 fn recursive_instruction() -> Instruction {
-    // we can have an if here for example
-    if CONDITION {
+    if some_condition {
         return Instruction { 
             inst_type: Type::Scope,
             parameters: vec![recursive_instruction()],

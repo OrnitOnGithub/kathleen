@@ -1,7 +1,10 @@
-use std::{fs::read_to_string, num::IntErrorKind};
+use std::fs::read_to_string;
 
-mod tokenizer;  // This is the code for the tokenizer; first step of compilation.
-                // Check tokenizer.rs for more info
+mod tokenizer;      // This is the code for the tokenizer; first step of compilation.
+                    // Check `src/tokenizer.rs` for more info
+
+mod ir_generator;   // This is the code for the generation of the Intermediate 
+                    // Representation. Check `src/ir_generator.rs` for more info
 
 // File path - Later the compiler should take this as a parameter.
 const FILEPATH: &str = "mylang.c";
@@ -24,53 +27,8 @@ fn main() {
 
     // Tokenize (and preprocess) the code. See `tokenize` function
     // (in tokenizer.rs) for more info
-    let mut tokenized_lines = tokenizer::tokenize(lines);
+    let tokenized_lines = tokenizer::tokenize(lines);
 
-    
+    let intermediate_representation = ir_generator::generate_ir(tokenized_lines);
 
-}
-
-/// Represents an instruction or a set of instructions
-/// in the intermediate representation.
-/// `inst_type` defines the type of instruction, while `parameters`
-/// contains a vector of additional instructions or arguments
-/// associated with this instruction.
-// #[derive(Debug)]
-struct Instruction {
-    inst_type: Type,
-    parameters: Vec<Instruction>,
-}
-
-/// This Enum enumerates different types of "instructions",
-/// including definitions for sections like `.data`, loop
-/// constructs, conditions, functions, identifiers,
-/// constants, and various data types.
-//#[derive(Debug)]
-enum Type {
-    StaticData,         // Section .data
-    Main,               // global main \n main:
-
-    Scope,
-    ScopeExit,
-
-    Function,           // The start of the function
-    FunctionCall,       // To call the function
-    FunctionReturn,     // To exit the function
-
-    Loop,
-    LoopBreak,
-
-    Condition,          // Define the evaluation
-    ConditionTrue,      // Where to go if TRUE Basical
-    ConditionFalse,     // Where to go if FALSE
-    ConditionExitPoint, // Basically ret, same as function return
-
-    Identifier(i32),    // To differentiate between for example jump points.
-                        // Must be incremented after each use
-    List,
-    Const,              // Lifetime = whole execution, immutable
-    Static,             // Lifetime = whole execution, it is mutable though
-    Int(i32),
-    Float(f32),
-    String(String),
 }
