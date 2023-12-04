@@ -31,4 +31,6 @@ fn main() {
 
     let intermediate_representation = ir_generator::generate_ir(tokenized_lines);
 
+    println!("IR: {:?}", intermediate_representation);
+
 }
