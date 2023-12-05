@@ -1,49 +1,49 @@
-pub fn generate_ir(mut tokenized_lines: Vec<Vec<String>>) -> Instruction {
+pub fn generate_ir(mut tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
     // Vec<Vec<String>>
     // outer Vector (Vec<Vec<String>>): line
     // inner Vector (Vec<String>): word (String)
 
-    fn create_instruction(code: &mut Vec<Vec<String>>) -> Instruction {
-        
-        // What I think this does is just remove the last keyword if it exists
-        // OK TURNS OUT IT REMOVES EVERYTHING JUST AS I THOUGHT!! THANKS DEBUGGER!!
-        /*
-        for line in code.iter_mut() {
-            while let Some(_) = line.pop() {}
-        }
-        */
+    let mut instructions: Vec<Instruction> = Vec::new();
 
-        for line in code {
-            word = line[0].
-        }
-        
-                match &word as &str {
-                    "{" => {
-                        return Instruction {
-                            inst_type: Type::Scope,
-                            parameters: vec![create_instruction(code)],
-                        };
-                    }
+    for mut line in tokenized_lines.into_iter() {
+        instructions.push(create_instruction(&mut line));
+    }
 
-                    _ => {
-                        // replace this with unrecognised keyword error
-                        return Instruction {
-                            inst_type: Type::Loop,
-                            parameters: vec![],
-                        };
-                    }
+    fn create_instruction(line: &mut Vec<String>) -> Instruction {
+        
+        while (line.len() > 0) {
+
+            let word = line[0].clone();
+            
+            line.remove(0);
+            
+            match &word as &str {
+                "{" => {
+                    return Instruction {
+                        inst_type: Type::Scope,
+                        parameters: vec![create_instruction(line)],
+                    };
                 }
-
-        return Instruction{
+                
+                _ => {
+                    // replace this with unrecognised keyword error
+                    return Instruction {
+                        inst_type: Type::Loop,
+                        parameters: vec![],
+                    };
+                }
+            }
+        }
+        return Instruction{ // If this gets returned it means there was an empty line
             inst_type : Type::Undefined,
             parameters : vec![],
         };
+        }
 
+
+        return instructions;
     }
 
-    let instructions = create_instruction(&mut tokenized_lines);
-    return instructions;
-}
 
 
 /// Represents an instruction or a set of instructions
