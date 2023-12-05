@@ -6,6 +6,9 @@ mod tokenizer;      // This is the code for the tokenizer; first step of compila
 mod ir_generator;   // This is the code for the generation of the Intermediate 
                     // Representation. Check `src/ir_generator.rs` for more info
 
+mod error;          // This is the code for throwing errors.
+                    // For more info check src/error.rs
+
 // File path - Later the compiler should take this as a parameter.
 const FILEPATH: &str = "mylang.c";
 
