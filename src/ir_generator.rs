@@ -1,6 +1,7 @@
-use crate::error::{throw_error, ErrorCode}; // For throwing errors.
+use crate::error::{print_error, ErrorCode, throw_errors}; // For throwing errors.
 
-/// I'll document this later
+/// Generates the intermediate representation.
+/// Check `src/ir_generator.rs` for more info.
 pub fn generate_ir(tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
     // tokenized_lines: Vec<Vec<String>>
     //     outer Vector (Vec<Vec<String>>): line (Vec<String>)
@@ -52,7 +53,7 @@ pub fn generate_ir(tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
         while line.len() > 0 {
 
             // Copy the word to process it later ---.
-            let word = line[0].clone(); //          |
+            let word = line[0].clone(); //     |
             //                                      |
             // Remove the first word                |
             line.remove(0); //                      |
@@ -62,13 +63,17 @@ pub fn generate_ir(tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
                 "{" => {
                     // This is the start of a Scope
                     // when this occurs, a Scope Instruction struct is created and
-                    // The function is called a gain inside this Scope Instruction struct.
-
+                    // The function is called a gain inside this Scope Instruction
+                    // struct.
 
                     // line.remove(0); // this is allowed!! 
                                        // reminder to use this for variables or smth
                     return Instruction {
                         inst_type: Type::Scope,
+                        // problem here !!
+                        // maybe revisit the stack of scopes idea
+                        // basically append instructions to last element in stack of
+                        // scopes, and when "}" is reached, return that last scope
                         parameters: vec![create_instruction(line, line_number)],
                     };
                 }
@@ -76,7 +81,7 @@ pub fn generate_ir(tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
                 _ => {
                     // replace this with unrecognised keyword error
 
-                    throw_error(ErrorCode::UnknownKeyword, line_number);
+                    print_error(ErrorCode::UnknownKeyword, line_number);
 
                     return Instruction {
                         inst_type: Type::Loop,
@@ -91,7 +96,9 @@ pub fn generate_ir(tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
         };
         }
 
-
+        // This will only throw an error if any errors occurred earlier.
+        // Check `src/error.rs` for more info
+        //throw_errors();
         return instructions;
     }
 

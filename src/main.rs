@@ -10,7 +10,7 @@ mod error;          // This is the code for throwing errors.
                     // For more info check src/error.rs
 
 // File path - Later the compiler should take this as a parameter.
-const FILEPATH: &str = "mylang.c";
+pub static FILEPATH: &str = "mylang.c";
 
 // From now on in comments, "the code" refers to the
 // programming language this compiler compiles for.
