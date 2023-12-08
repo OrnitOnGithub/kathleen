@@ -53,7 +53,7 @@ pub fn generate_ir(tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
         while line.len() > 0 {
 
             // Copy the word to process it later ---.
-            let word = line[0].clone(); //     |
+            let word = line[0].clone(); //          |
             //                                      |
             // Remove the first word                |
             line.remove(0); //                      |
@@ -90,7 +90,7 @@ pub fn generate_ir(tokenized_lines: Vec<Vec<String>>) -> Vec<Instruction> {
                 }
             }
         }
-        return Instruction{ // If this gets returned it means there was an empty line
+        return Instruction { // If this gets returned it means there was an empty line
             inst_type : Type::Undefined,
             parameters : vec![],
         };
