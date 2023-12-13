@@ -1,8 +1,6 @@
 # Ornit's Compiler
 
-This is the second iteration of my compiler. The first iteration was actually an interpret, whatever.
-
-For more info check `non-code` directory. That's where the docs and everything else are.
+This is a TM
 
 ## The Goal
 
