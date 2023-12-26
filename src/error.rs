@@ -13,17 +13,18 @@ pub enum ErrorCode {
 /// 
 /// `throw_errors` will actually cause the panic but only if
 /// `print_errors()` was called at least once
-pub fn print_error(error_code: ErrorCode, line: usize) {
+pub fn print_error(error_code: ErrorCode, line: usize, extra_info: &str) {
     match error_code {
         ErrorCode::UnknownKeyword => {
             println!();
-            println!("Unkown keyword at line #{}", (line+1));
+            println!("Unkown token \"{}\" at line #{}", extra_info, (line+1));
             show_lines(line);
             println!();
         }
         _ => {
             println!();
             println!("Unkown error occurred at line #{}", (line+1));
+            println!("Additional information: {}", extra_info);
             show_lines(line);
             println!();
         }

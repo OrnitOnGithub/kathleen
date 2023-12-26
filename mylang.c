@@ -1,7 +1,17 @@
 // Using .c file extension just to have some syntax highlighting inside vscode
 
-main () {
-    {
-        print(a)
-    } // the compiler should understand this closing bracket isn't for main
+const hi: int = hi
+
+static fortnite: int = 234
+
+main {
+
+    let varname int = 7
+
+    let hello str = "hello"
+
+    print varname
+
+    print hello
+
 }
