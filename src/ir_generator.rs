@@ -1,31 +1,14 @@
 use crate::error::{print_error, ErrorCode, throw_errors}; // For throwing errors.
+use crate::tokenizer::Token;
 
 
-pub fn generate_ir(tokenised_lines: Vec<Vec<String>>) {
+pub fn generate_ir(tokens: Vec<Token>) {
 
     let mut instructions: Vec<Instruction> = Vec::new();
 
-
-    for (line_number, line) in tokenised_lines.iter().enumerate() {
-        for token in line {
-            match token {
-
-
-                
-
-
-
-                _ => {
-                    print_error(ErrorCode::UnknownKeyword, line_number, token)
-                }
-            }
-        }
-    }
+    
 
 }
-
-
-
 /// Represents an instruction or a set of instructions
 /// in the intermediate representation.
 /// `inst_type` defines the type of instruction, while `parameters`

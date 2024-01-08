@@ -4,7 +4,7 @@ const hi: int = hi
 
 static fortnite: int = 234
 
-main {
+main() {
 
     let varname int = 7
 

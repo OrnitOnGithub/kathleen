@@ -22,17 +22,17 @@ fn main() {
     // The only reason we separate lines is for the 
     // compiler to be able to return a line number when
     // an error occurs. All we do is return the index + 1.
-    let mut lines = Vec::new();
+    let mut code_lines = Vec::new();
     // Iterate through the lines, add to Vector
     for line in read_to_string(FILEPATH).unwrap().lines() {
-        lines.push(line.to_string());
+        code_lines.push(line.to_string());
     }
 
     // Tokenize (and preprocess) the code. See `tokenize` function
     // (in tokenizer.rs) for more info
-    let tokenized_lines = tokenizer::tokenize(lines);
+    let tokens = tokenizer::tokenize(code_lines);
 
-    let intermediate_representation = ir_generator::generate_ir(tokenized_lines);
+    let intermediate_representation = ir_generator::generate_ir(tokens);
 
     println!("IR: {:?}", intermediate_representation);
 
