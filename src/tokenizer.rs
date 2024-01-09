@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 /// This is the tokeniser and the pre-processor
 /// 
 /// This function does a few things:
@@ -13,21 +15,57 @@
 /// ```
 pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
-    // Tokenise the code by splitting every whitespace character.
-    // Store all tokens in a vector
-    // We get a Vector like this:
-    // ```
-    //   line 1         line 2
-    // [["Hello"], ["hi", "there"]]
-    // ```
-    let mut tokenised_lines = Vec::new();
+    let mut tokenised_lines: Vec<Vec<String>> = Vec::new();
+
+    // Define a set of special characters
+    let special_chars: HashSet<char> = [
+        '(', ')',
+        '{', '}',
+        '[', ']',
+        '<', '>',
+        '\'', '"',
+        '!', '|', '^',
+        ',', '.', ':', ';',
+        '+', '*', '/', '-', '=',
+
+        ].iter().cloned().collect();
+
+    // Iterate over each line in the input
     for line in lines {
-        // Create a new vector with every token
-        tokenised_lines.push(
-            line.split_whitespace().map(|s| s.to_string()).collect::<Vec<String>>()
-        );
+        // Initialize a vector to hold the tokens of the current line
+        let mut tokens = Vec::new();
+        // Initialize a string to hold the current token
+        let mut token = String::new();
+
+        for ch in line.chars() {
+            if ch.is_whitespace() {
+                if !token.is_empty() {
+                    tokens.push(token);
+                }
+                token = String::new();
+            }
+            else if special_chars.contains(&ch) {
+                if !token.is_empty() {
+                    tokens.push(token);
+                }
+                token = String::new();
+                tokens.push(ch.to_string())
+            }
+            else {
+                token.push(ch);
+            }
+        }
+
+        // If the last token is not empty, push it to the tokens vector
+        if !token.is_empty() {
+            tokens.push(token);
+        }
+
+        // Push the tokens vector to the tokenised_lines vector
+        tokenised_lines.push(tokens);
     }
-    println!("tokens: {:?}", tokenised_lines);
+
+    println!("tokens: {:?}",tokenised_lines);
 
 
     // Remove all comments from the code
@@ -57,7 +95,7 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
     // Turn everything into a Token struct.
     // This struct contains the token itself as a String
     // and other information such as what line it's in and
-    // Its position in that line.
+    // its position in that line.
     // Originally indices in the Vec<Vec<String>> were used
     // as line count and token position, but it turns out
     // it's easier to have a continuous stream of tokens.

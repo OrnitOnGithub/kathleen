@@ -16,7 +16,7 @@ The list of characters to separate is:
 
 ```
 ( ) [ ] { }
-+ * % / & = < > ! | ^
-, . ; : ' 
+- + * % / & = < > ! | ^
+, . ; : ' "
 ```
 
