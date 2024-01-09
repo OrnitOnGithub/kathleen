@@ -17,33 +17,41 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
     let mut tokenised_lines: Vec<Vec<String>> = Vec::new();
 
-    // Define a set of special characters
-    let special_chars: HashSet<char> = [
-        '(', ')',
-        '{', '}',
-        '[', ']',
-        '<', '>',
-        '\'', '"',
-        '!', '|', '^',
-        ',', '.', ':', ';',
-        '+', '*', '/', '-', '=',
 
+    // SEPARATE TOKENS BY WHITESPACE AND SPECIAL CHARACTERS
+
+    // A set of special characters to separate
+    let special_chars: HashSet<char> = [ // for clarity:
+        '(', ')',                       // brackets
+        '{', '}',                       // curly brackets
+        '[', ']',                       // square brackets
+        '<', '>',                       // smaller and greater signs
+        '\'', '"',                      // apostrophe and quotation mark
+        '!', '|', '&',                  // exclamation mark, or operator, and operator
+        ',', '.', ':', ';',             // comma, period, colon, semicolon
+        '+', '*', '/', '-', '=', '^',   // mathematical operators: plus, multiplication, 
+                                        // division, minus, equals, power
         ].iter().cloned().collect();
 
-    // Iterate over each line in the input
     for line in lines {
-        // Initialize a vector to hold the tokens of the current line
+        // Vector to hold the tokens of the current line
         let mut tokens = Vec::new();
-        // Initialize a string to hold the current token
+        // String to hold the current token
         let mut token = String::new();
 
+        // Iterate through every character
         for ch in line.chars() {
+            // If that character is a space, add the token variable
+            // the tokens vector and clear the token variable
             if ch.is_whitespace() {
-                if !token.is_empty() {
+                if !token.is_empty() { // Sometimes there was nothing here before
                     tokens.push(token);
                 }
                 token = String::new();
             }
+            // If the character is a special token, add the token variable
+            // to the tokens vector, as well as the special character as
+            // another token.
             else if special_chars.contains(&ch) {
                 if !token.is_empty() {
                     tokens.push(token);
@@ -51,6 +59,8 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
                 token = String::new();
                 tokens.push(ch.to_string())
             }
+            // Otherwise, it is just a normal character part of a normal word,
+            // so just push it to the token variable.
             else {
                 token.push(ch);
             }
@@ -62,33 +72,33 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
         }
 
         // Push the tokens vector to the tokenised_lines vector
+        // This is equal to adding one line to the vector
         tokenised_lines.push(tokens);
     }
 
     println!("tokens: {:?}",tokenised_lines);
 
+    // REMOVE COMMENTS
 
-    // Remove all comments from the code
-    // Leave blank spaces where there were comments to maintain
-    // the line count
-    //
-    // CURRENTLY WE ONLY HAVE "//" IMPLEMENTED
-    // As soon as we meet "//" -> Rest of the line becomes a comment
+    // Run through the lines.
+    // If two "/" tokens are found consecutively, delete them as well as
+    // the rest of the line.
     for line_index in 0..tokenised_lines.len() {
         let line = &mut tokenised_lines[line_index];
-    
-        // Find the index of the first occurrence of "//"
-        if let Some(index) = line.iter().position(|keyword| keyword == "//") {
-            line.truncate(index); // Remove elements from the index to the end
+
+        if line.len() > 1 { // ignore lines shorter than 2 characters
+            for i in 0..(line.len() - 1) { // -1 : no need to check last character
+                if line[i] == "/" && line[i+1] == "/" { // if two consecutive "/"s are found
+                    line.truncate(i);   // cut off the rest of the line
+                    break;  // exit the loop because otherwise we's be iterating over nothing.
+                }
+            }
         }
     }
-    
+
+
     println!();
     println!("commentless tokens: {:?}", tokenised_lines);
-
-
-    // Extra splitting by special characters
-
 
 
 
