@@ -129,7 +129,7 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     token: String,          // the token itself
     line: usize,            // which line this at

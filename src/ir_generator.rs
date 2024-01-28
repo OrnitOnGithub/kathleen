@@ -1,12 +1,21 @@
 use crate::error::{print_error, ErrorCode, throw_errors}; // For throwing errors.
 use crate::tokenizer::Token;
 
-
-pub fn generate_ir(tokens: Vec<Token>) {
+/// We need to keep track of
+/// - instructions
+/// - scopes
+/// - lists and parameters
+/// - idk bro
+pub fn generate_ir(mut tokens: Vec<Token>) {
 
     let mut instructions: Vec<Instruction> = Vec::new();
 
+    // We need to separate the tokens by instructions and scopes.
+    // or we can generate shit on the spot
+    // OMG recursive function that may call itself but only returns when meets ;
     
+
+    tokens.remove(0);
 
 }
 /// Represents an instruction or a set of instructions
@@ -14,7 +23,7 @@ pub fn generate_ir(tokens: Vec<Token>) {
 /// `inst_type` defines the type of instruction, while `parameters`
 /// contains a vector of additional instructions or arguments
 /// associated with this instruction.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Instruction {
     inst_type: Type,
     parameters: Vec<Instruction>,
@@ -24,7 +33,7 @@ pub struct Instruction {
 /// including definitions for sections like `.data`, loop
 /// constructs, conditions, functions, identifiers,
 /// constants, and various data types.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Type {
     StaticData,         // Section .data
     Main,               // global main \n main:
