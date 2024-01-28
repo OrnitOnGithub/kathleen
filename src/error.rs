@@ -3,6 +3,7 @@ use crate::FILEPATH;
 pub static mut ERROR_COUNT: usize = 0;
 
 use std::fs::read_to_string;
+use crate::tokenizer::Token;
 /// used in the `throw_error()`
 pub enum ErrorCode {
     /// Error code for any keyword that is not recognised
@@ -13,19 +14,25 @@ pub enum ErrorCode {
 /// 
 /// `throw_errors` will actually cause the panic but only if
 /// `print_errors()` was called at least once
-pub fn print_error(error_code: ErrorCode, line: usize, extra_info: &str) {
+pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
+
+    if extra_info == "" {
+        extra_info = "none";
+    }
+
     match error_code {
         ErrorCode::UnknownKeyword => {
             println!();
-            println!("Unkown token \"{}\" at line #{}", extra_info, (line+1));
-            show_lines(line);
+            println!("Unkown token \"{}\" at line #{}", token.token, (token.line+1));
+            show_lines(token.line);
+            println!("Additional information: {}", extra_info);
             println!();
         }
         _ => {
             println!();
-            println!("Unkown error occurred at line #{}", (line+1));
+            println!("Unkown error occurred at line #{}", (token.line+1));
             println!("Additional information: {}", extra_info);
-            show_lines(line);
+            show_lines(token.line);
             println!();
         }
     }
@@ -40,10 +47,7 @@ pub fn print_error(error_code: ErrorCode, line: usize, extra_info: &str) {
 /// Before this panic, if errors occurred, they will already
 /// have been printed by `print_error()`
 pub fn throw_errors() {
-    println!();
-    unsafe {
-        println!("{} Errors occurred.", ERROR_COUNT);
-    }
+    unsafe { println!("Errors occurred: {}", ERROR_COUNT); }
     println!();
     unsafe {
         if ERROR_COUNT > 0 {
