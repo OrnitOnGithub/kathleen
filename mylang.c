@@ -1,5 +1,5 @@
 // Using .c file extension just to have some syntax highlighting inside vscode
-const hi int = 1;
+let hi int const = 12344;
 
 static fortnite int = 234;
 

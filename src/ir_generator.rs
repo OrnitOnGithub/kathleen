@@ -42,8 +42,9 @@ pub fn generate_ir(mut tokens: Vec<Token>) {
             // find where the `=` is located, because we know everyhing after that is (a) value(s)
             let mut index_of_equal: usize = 0;
             for (index, token) in tokens.clone().iter().enumerate() {
-                if token.token == "=" {
+                if token.token == String::from("=") {
                     index_of_equal = index;
+                    break
                 }
             }
 
@@ -51,17 +52,22 @@ pub fn generate_ir(mut tokens: Vec<Token>) {
                 // Now let's check what variable type we've got.
                 // types: int, str
                 // (value, value, value)
-                // "string, string, string"
+                // "string string string"
 
                 "int" => {
-                    todo!()
+                    let instruction: Instruction = Instruction {
+                         inst_type: Type::Int(tokens[index_of_equal+1].token.clone().as_str().parse::<i32>().unwrap()),
+                         parameters: Vec::from([Type::Name(varname)]),
+                        };
+                    println!("{:?}", instruction)
                 }
                 "str" => {
                     todo!()
                 }
 
                 _ => {
-                    print_error(ErrorCode::UnknownKeyword, tokens[0].clone(), "");
+                    print_error(ErrorCode::UnknownKeyword, tokens[2].clone(), "Unknown \
+                    data type. The third token of a let binding is a data type.");
                 }
             };
         }
@@ -109,8 +115,7 @@ pub enum Type {
     ConditionFalse,     // Where to go if FALSE
     ConditionExitPoint, // Basically ret, same as function return
 
-    Identifier(i32),    // To differentiate between for example jump points.
-                        // Must be incremented after each use
+    Name(String),
     List,
     Const,              // Lifetime = whole execution, immutable
     Static,             // Lifetime = whole execution, it is mutable though
