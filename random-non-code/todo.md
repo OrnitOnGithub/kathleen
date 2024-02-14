@@ -1,0 +1,18 @@
+- [ ] Design an IR
+- [ ] Get `let` and `print` to compile
+  - [ ] Have them turn into the IR
+    - [ ] `let`
+    - [ ] `print`
+  - [ ] Have the program compile from IR to ASM
+    - [ ] Create a "second IR" that is just 1-to-1 IR/ASM instructions
+    - [ ] Create list of small ASM blocks
+    - [ ] Compile
+- [ ] Celebrate first compilation
+  - [ ] Reorganise `random-non-code` and the whole project overall
+  - [ ] Work on document (gotta have 1500-2000 words by August...)
+- [ ] Add `bool`s and `drop`
+- [ ] Add mathematical operators
+- [ ] Add `fn` and `return`
+- [ ] Add `loop` and `break`
+- [ ] Add `if` and `else` if I'm feeling generous
+- [ ] Make release / package?

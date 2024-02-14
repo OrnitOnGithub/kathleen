@@ -1,26 +1,19 @@
 use crate::error::{print_error, ErrorCode, throw_errors}; // For throwing errors.
 use crate::tokenizer::Token;
 
-/// We need to keep track of
-/// - instructions
-/// - scopes
-/// - lists and parameters
-/// - idk bro
+/// This is the function that turns a Vector of Token structs into the final Vector of Instructions.
 pub fn generate_ir(mut tokens: Vec<Token>) {
 
-    let mut instructions: Vec<Instruction> = Vec::new();
+    // This is what a Token struct looks like btw:
+    /*
+    {
+        token: String,          // the token itself
+        line: usize,            // which line this at
+        token_number: usize,    // which token in the line this is (1st, 2nd...)
+    }
+    */
 
-    // We need to separate the tokens by instructions and scopes.
-    // or we can generate shit on the spot
-    // OMG recursive function that may call itself but only returns when meets ;
-    
-/*
-{
-    token: String,          // the token itself
-    line: usize,            // which line this at
-    token_number: usize,    // which token in the line this is (1st, 2nd...)
-}
-*/
+    let mut instructions: Vec<Instruction> = Vec::new();
 
     // later, put this in a loop, where:
     // - this runs once
@@ -32,14 +25,15 @@ pub fn generate_ir(mut tokens: Vec<Token>) {
 
         "let" => {
             // This is a let binding. A variable is being defined.
-            // EXAMPLE: let varname str = "light"
-            // EXAMPLE: let varname int const = 1234
+            // EXAMPLE: let varname bool = true;
+            // EXAMPLE: let varname int const = 1234;
+            // note: not handleing const yet
 
             // tokens[1] (the second token) is the variable name.
             let varname: String = tokens[1].token.clone();
             // We will store it for later use.
 
-            // find where the `=` is located, because we know everyhing after that is (a) value(s)
+            // find where the (first) `=` is located, because we know everyhing after that is (a) value(s)
             let mut index_of_equal: usize = 0;
             for (index, token) in tokens.clone().iter().enumerate() {
                 if token.token == String::from("=") {
@@ -50,19 +44,32 @@ pub fn generate_ir(mut tokens: Vec<Token>) {
 
             match tokens[2].token.as_str() {
                 // Now let's check what variable type we've got.
-                // types: int, str
-                // (value, value, value)
-                // "string string string"
+                // types: int, bool
 
                 "int" => {
+                    // We found an int! Let's create the `Instruction` for it.
+                    // TODO: support for operations after the equal.
                     let instruction: Instruction = Instruction {
-                         inst_type: Type::Int(tokens[index_of_equal+1].token.clone().as_str().parse::<i32>().unwrap()),
-                         parameters: Vec::from([Type::Name(varname)]),
+                        inst_type: Type::Int(tokens[index_of_equal+1].token.clone().as_str().parse::<i32>().unwrap()),
+                        parameters: vec![Instruction {
+                            inst_type: Type::Name(varname),
+                            parameters: Vec::new(),
+                            }]
                         };
+                        // We have now created this unholy abomination:
+                        /*
+                        Instruction
+                        |---inst_type
+                        |     `-Type::Int(xyz)
+                        `---parameters
+                              `-Instruction
+                                |---inst_type
+                                |     `-Type::Name(xyz)
+                                `---parameters
+                                      `-[]
+                        */
+                        // Should this be done like this...?
                     println!("{:?}", instruction)
-                }
-                "str" => {
-                    todo!()
                 }
 
                 _ => {
@@ -120,6 +127,7 @@ pub enum Type {
     Const,              // Lifetime = whole execution, immutable
     Static,             // Lifetime = whole execution, it is mutable though
     Int(i32),
+    Bool(bool),
     Float(f32),
     String(String),
 

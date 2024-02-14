@@ -1,6 +1,6 @@
 # Ornit's Compiler
 
-This is a TM
+This is a very small compiler that is currently in the works.
 
 ## The Goal
 

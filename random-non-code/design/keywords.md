@@ -2,47 +2,62 @@
 
 A definition of all keywords
 
-## let
+```
+let
+drop
+bool
+int
+print
+loop
+break
+fn
+return
+if
+
++ mathematical operators
+```
+
+### let
 
 Initialises a variable
 
-## drop
+### drop
 
 Removes a variable from memory.
 
-## bool
+### bool
 
 The boolean data type
 
-## int
+### int
 
 An integer
 
-## print
+### print
 
 Displays information in the terminal
 
-## loop
+### loop
 
 Creates a loop
 
-## break
+### break
 
 Exits the loop
 
-## fn
+### fn
 
 Define a function
 
-## return
+### return
 
 Return from function
 
-## If
+### If
 
 Conditional jump.
 
-## Operators
+### Operators
 ```
 !   not
 +   addition

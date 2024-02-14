@@ -135,4 +135,3 @@ pub struct Token {
     pub line: usize,            // which line this at
     pub token_number: usize,    // which token in the line this is (1st, 2nd...)
 }
-

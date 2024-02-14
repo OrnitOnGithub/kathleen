@@ -18,10 +18,8 @@ pub static FILEPATH: &str = "mylang.c";
 fn main() {
 
     // Create a Vector for each line of the code.
-    //
-    // The only reason we separate lines is for the 
-    // compiler to be able to return a line number when
-    // an error occurs. All we do is return the index + 1.
+    // The tokenizer function will use this to know which line of code
+    // each token is in.
     let mut code_lines = Vec::new();
     // Iterate through the lines, add to Vector
     for line in read_to_string(FILEPATH).unwrap().lines() {
