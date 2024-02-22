@@ -1,15 +1,18 @@
-- [ ] Design an IR
+- [x] Design an IR
 - [ ] Get `let` and `print` to compile
-  - [ ] Have them turn into the IR
-    - [ ] `let`
-    - [ ] `print`
+  - [x] Have them turn into the IR
+    - [x] `let`
+    - [x] `print` (halfway)
   - [ ] Have the program compile from IR to ASM
-    - [ ] Create a "second IR" that is just 1-to-1 IR/ASM instructions
+    - [x] Create a "second IR" that is just 1-to-1 IR/ASM instructions
     - [ ] Create list of small ASM blocks
     - [ ] Compile
 - [ ] Celebrate first compilation
   - [ ] Reorganise `random-non-code` and the whole project overall
-  - [ ] Work on document (gotta have 1500-2000 words by August...)
+  - [ ] Write a proper README
+  - [ ] Work on document/report thingy
+- [ ] Make errors look nicer, with colorize crate
+- [ ] Keep track of all existing variables, for both static vs ref and error handling reasons
 - [ ] Add `bool`s and `drop`
 - [ ] Add mathematical operators
 - [ ] Add `fn` and `return`

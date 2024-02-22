@@ -29,7 +29,7 @@ If two consecutive "/" tokens are met, delete them and the rest of the line.
 ```rust
 {
     token: String,          // the token itself
-    line: usize,            // which line this at
-    token_number: usize,    // which token in the line this is (1st, 2nd...)
+    line: usize,            // which line this is at
+    token_number: usize,    // index of token in line
 }
 ```

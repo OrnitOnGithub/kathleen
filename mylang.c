@@ -1,16 +1,8 @@
 // Using .c file extension just to have some syntax highlighting inside vscode
-let hi int const = 12344;
+let hi int = 12344;
 
-static fortnite int = 234;
+let varname int = 12;
 
-main() {
+let variable123 int you can put anything here btw lol = 12;
 
-    let varname int = 7;
-
-    let hello str = "hello";
-
-    print(varname)
-
-    print(hello)
-
-}
+println(varname variable123 hi);

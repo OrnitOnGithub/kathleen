@@ -90,7 +90,7 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
             for i in 0..(line.len() - 1) { // -1 : no need to check last character
                 if line[i] == "/" && line[i+1] == "/" { // if two consecutive "/"s are found
                     line.truncate(i);   // cut off the rest of the line
-                    break;  // exit the loop because otherwise we's be iterating over nothing.
+                    break;  // exit the loop because otherwise we'd be iterating over nothing.
                 }
             }
         }
