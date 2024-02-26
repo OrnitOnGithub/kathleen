@@ -6,13 +6,16 @@ use crate::ir_generator::{Instruction, Type};
 /// assembly code.
 pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
     let mut data: Vec<NAI> = Vec::new();    // The .data section, where constants and pointers are defined.
-    let mut bss: Vec<NAI> = Vec::new();     // The .bss section. This might not get used lol
+    let mut bss: Vec<NAI> = Vec::new();     // The .bss section, mainly used to store heap pointers
     let mut main: Vec<NAI> = Vec::new();    // The .main section, called in .text
 
     for instruction in instructions {
         match instruction.inst_type {
 
             // Int creation
+            // It should really not be done like this!
+            // pointer (8 bytes) -> pointer (8 bytes) -> int (8 bytes)
+            // ignoring the first pointer, that's twice as much data per int!
             Type::Int(value) => {
                 let name_struct: Type = instruction.parameters[0].inst_type.clone();
                 let varname: String = if let Type::Name(s) = name_struct {
@@ -21,8 +24,8 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
                     panic!("Unexpected enum variant");
                 };
 
-                data.push( NAI::CreatePointer(varname.clone()) );
-                main.push( NAI::AssignIntToPointer(varname.clone(), value) )
+                bss.push( NAI::CreatePointer(varname.clone()) );
+                main.push( NAI::AllocateInt(varname.clone(), value) )
             }
             
             // Print
@@ -35,12 +38,13 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
                 };
                 main.push( NAI::PrintReferenceTo(varname) );
             }
+            // Only print a newline.
             Type::PrintLn => {
                 main.push(NAI::PrintLn);
             }
 
             _ => {
-                println!("nothing")
+                println!("DEV: Not an implemented instruction yet")
             }
         }
     }
@@ -56,12 +60,12 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
 /// turned into an assembly block of code.
 #[derive(Debug, Clone)]
 pub enum NAI {
-    CreatePointer(String),
-    AssignIntToPointer(String, i32),
+    CreatePointer(String),      // Create a pointer in the .bss section to memory.
+    AllocateInt(String, i32),   // Allocate a dword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
 
-    PrintReferenceTo(String),
-    Print(String),
-    PrintLn,
+    PrintReferenceTo(String),   // Dereference, (convert data type) and print
+    Print(String),              // Print a constant str, defined in .data
+    PrintLn,                    // Print a newline.
 }
 /// This is the near assembly representation struct.
 #[derive(Debug, Clone)]

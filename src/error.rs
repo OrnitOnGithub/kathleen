@@ -14,6 +14,7 @@ pub enum ErrorCode {
 /// 
 /// `throw_errors` will actually cause the panic but only if
 /// `print_errors()` was called at least once
+///
 pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
 
     if extra_info == "" {
@@ -46,6 +47,7 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
 /// 
 /// Before this panic, if errors occurred, they will already
 /// have been printed by `print_error()`
+///
 pub fn throw_errors() {
     unsafe { println!("Errors occurred: {}", ERROR_COUNT); }
     println!();
@@ -57,7 +59,7 @@ pub fn throw_errors() {
 }
 
 
-/// Show the lines around
+/// Show the lines around the problematic one
 fn show_lines(line: usize) {
 
     // Create a Vector for each line of the code.

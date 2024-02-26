@@ -2,10 +2,11 @@
 - [ ] Get `let` and `print` to compile
   - [x] Have them turn into the IR
     - [x] `let`
-    - [x] `print` (halfway)
+    - [ ] `print`
   - [ ] Have the program compile from IR to ASM
     - [x] Create a "second IR" that is just 1-to-1 IR/ASM instructions
-    - [ ] Create list of small ASM blocks
+    - [x] Create list of small ASM blocks
+    - [ ] Generate the ASM
     - [ ] Compile
 - [ ] Celebrate first compilation
   - [ ] Reorganise `random-non-code` and the whole project overall

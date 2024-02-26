@@ -17,7 +17,6 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
     let mut tokenised_lines: Vec<Vec<String>> = Vec::new();
 
-
     // SEPARATE TOKENS BY WHITESPACE AND SPECIAL CHARACTERS
 
     // A set of special characters to separate
@@ -76,8 +75,6 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
         tokenised_lines.push(tokens);
     }
 
-    println!("tokens: {:?}",tokenised_lines);
-
     // REMOVE COMMENTS
 
     // Run through the lines.
@@ -95,12 +92,6 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
             }
         }
     }
-
-
-    println!();
-    println!("commentless tokens: {:?}", tokenised_lines);
-
-
 
     // Turn everything into a Token struct.
     // This struct contains the token itself as a String
@@ -122,8 +113,6 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
             )
         }
     }
-    println!("");
-    println!("Token struct: {:?}", tokens);
 
     return tokens;
 

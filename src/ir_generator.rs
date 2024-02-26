@@ -89,7 +89,6 @@ pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
                                     `---parameters
                                     `-[]
                             */
-                            println!("{:?}", instruction);
                             instructions.push(instruction);
                         }
                             
@@ -177,7 +176,6 @@ pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
     }
     
     let ir: Vec<Instruction> = create_instructions(tokens);
-    println!("{:?}", ir);
     
     throw_errors(); // cause panic if there were any errors
 

@@ -10,6 +10,9 @@ mod nar_generator;  // This is the code for the generation of the second IR,
                     // the Near Assembly Representation. Check `src/ir_generator.rs`
                     // for more info.
 
+mod asm_generator;  // This is the code responsible for generating the assembly
+                    // output. Check `src/asm_generator.rs` for more info.
+
 mod error;          // This is the code for throwing errors.
                     // Check `src/error.rs` for more info
 
@@ -29,16 +32,20 @@ fn main() {
     for line in read_to_string(FILEPATH).unwrap().lines() {
         code_lines.push(line.to_string());
     }
+    println!("Code: {:?} \n", code_lines);
 
     // Tokenize (and preprocess) the code. See `tokenize` function
     // (in tokenizer.rs) for more info
     let tokens = tokenizer::tokenize(code_lines);
+    println!("Tokens: {:?} \n", tokens);
 
     let intermediate_representation = ir_generator::generate_ir(tokens);
-
-    //println!("IR: {:?}", intermediate_representation);
+    println!("IR: {:?} \n", intermediate_representation);
 
     let near_assembly_representation = nar_generator::generate_nar(intermediate_representation);
+    println!("NAR: {:?} \n", near_assembly_representation);
 
-    println!("NAR: {:?}", near_assembly_representation);
+    let assembly_output = asm_generator::generate_asm(near_assembly_representation);
+    println!("{:?} \n", assembly_output);
+
 }

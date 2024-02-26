@@ -1,0 +1,4 @@
+mov rdi, 8 ; ask for a qword (8 bytes)
+call malloc ; call malloc and recieve pointer in RAX
+; move that pointer in the memory at the BSS pointer
+mov [variable], rax

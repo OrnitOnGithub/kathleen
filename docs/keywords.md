@@ -7,13 +7,14 @@ let
 drop
 bool
 int
+slice
+str
 print
 loop
 break
 fn
 return
 if
-
 + mathematical operators
 ```
 
