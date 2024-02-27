@@ -8,7 +8,6 @@ section .data
     extern malloc
     fail_msg db "Malloc failed.", 10, 0
 	sentence db "Hello world, this is a long sentence", 10, 0
-	const10: dq 10
 	
 section .text
     global main

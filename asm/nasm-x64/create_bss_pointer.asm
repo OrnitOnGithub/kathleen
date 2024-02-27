@@ -1,1 +1,1 @@
-variable resq 1
+<> resq 1

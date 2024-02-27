@@ -61,7 +61,7 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
 #[derive(Debug, Clone)]
 pub enum NAI {
     CreatePointer(String),      // Create a pointer in the .bss section to memory.
-    AllocateInt(String, i32),   // Allocate a dword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
+    AllocateInt(String, u64),   // Allocate a dword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
 
     PrintReferenceTo(String),   // Dereference, (convert data type) and print
     Print(String),              // Print a constant str, defined in .data

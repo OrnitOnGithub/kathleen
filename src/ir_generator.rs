@@ -71,7 +71,7 @@ pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
                             // TODO: support for operations after the equal.
                             let instruction: Instruction = Instruction {
                                 inst_type: Type::Int(tokens[index_of_equal+1].token
-                                    .clone().as_str().parse::<i32>().unwrap()),
+                                    .clone().as_str().parse::<u64>().unwrap()),
                                 parameters: vec![Instruction {
                                     inst_type: Type::Name(varname),
                                     parameters: Vec::new(),
@@ -215,7 +215,7 @@ pub enum Type {
     Name(String),
     List,
     Static,             // Lifetime = whole execution, it is mutable though
-    Int(i32),
+    Int(u64),
     Bool(bool),
     Float(f32),
     String(String),

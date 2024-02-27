@@ -3,10 +3,6 @@ let hi int = 12344;
 
 let varname int = 12;
 
-let var invalidtype = 12;
-
-fuck;
-
 let variable123 int you can put anything here btw lol = 12;
 
-println(varname variable123 hi);
+// println(varname variable123 hi);
