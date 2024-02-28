@@ -44,7 +44,9 @@ pub fn generate_asm(nar: NAR) -> String {
 }
 
 /// This function takes two parameters:
-/// - `filepath: &str` the path to the assembly file to be used as template
+/// - `filepath: &str` the path to the assembly file to be used as template. Note
+///     that this creates the path like this: `asmpath+filepath`, asmpath being
+///     an already defined constant in the file.
 /// - `values_to_replace` a list of values to be placed in the assembly file
 ///
 /// This function iterates through the contents of the file until it finds "<>"
@@ -52,6 +54,29 @@ pub fn generate_asm(nar: NAR) -> String {
 /// Next time in encounters "<>" it will replace it with the next item in
 /// `values_to_replace`. It then returns the new edited file contents
 ///
+/// Here's an example usage of the function:
+/// ```rust
+/// asm += &replace_values_in_file("print_constant.asm", vec!["1", "constantname"]);
+/// ```
+/// 
+/// asmpath/print_constant.asm:
+/// ```asm
+/// mov         rdx,    <>      ; length of the message
+/// mov         rsi,    <>      ; pointer to the message
+/// mov         rdi,    1
+/// mov         rax,    1
+/// syscall
+/// ```
+/// 
+/// here is what will get appended to `asm`:
+/// ```asm
+/// mov         rdx,    1      ; length of the message
+/// mov         rsi,    constantname      ; pointer to the message
+/// mov         rdi,    1
+/// mov         rax,    1
+/// syscall
+/// ```
+/// 
 fn replace_values_in_file(filepath: &str, values_to_replace: Vec<&str>) -> String {
 
     let full_filepath: String = asm_path.to_owned()+filepath;
