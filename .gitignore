@@ -1,2 +1,5 @@
 target
 .vscode
+output.asm
+output.o
+output

@@ -3,13 +3,16 @@
   - [x] Have them turn into the IR
     - [x] `let`
     - [ ] `print`
-  - [ ] Have the program compile from IR to ASM
+      - [x] Print static strings (slices)
+      - [ ] Print dynamic strings
+      - [ ] Print integers
+  - [x] Have the program compile from IR to ASM
     - [x] Create a "second IR" that is just 1-to-1 IR/ASM instructions
     - [x] Create list of small ASM blocks
-    - [ ] Generate the ASM
-    - [ ] Compile
+    - [x] Generate the ASM
+    - [x] Compile
 - [ ] Celebrate first compilation
-  - [ ] Reorganise `random-non-code` and the whole project overall
+  - [x] Reorganise `random-non-code` and the whole project overall
   - [ ] Write a proper README
   - [ ] Work on document/report thingy
 - [ ] Make errors look nicer, with colorize crate

@@ -1,6 +1,6 @@
 use std::vec;
 
-use crate::error::{print_error, ErrorCode, throw_errors}; // For throwing errors.
+use crate::error::{self, print_error, throw_errors, ErrorCode, ERROR_COUNT}; // For throwing errors.
 use crate::tokenizer::Token;
 
 /// This is a function that turns a Vector of Token structs into the first Vector of (intermediate) Instructions.
@@ -69,26 +69,26 @@ pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
                         "int" => {
                             // We found an int! Let's create the `Instruction` for it.
                             // TODO: support for operations after the equal.
+                        
                             let instruction: Instruction = Instruction {
-                                inst_type: Type::Int(tokens[index_of_equal+1].token
-                                    .clone().as_str().parse::<u64>().unwrap()),
+                                inst_type: match tokens[index_of_equal + 1].token.clone().as_str().parse::<u64>() {
+                                    Ok(value) => Type::Int(value),
+                                    Err(e) => {
+                                        error::print_error(ErrorCode::IncorrectTypeValuePassed, tokens[2].clone(), "Value passed was not an unsigned 64 bit integer.");
+                                        // You might want to return a default value or handle it differently based on your needs
+                                        return vec![Instruction {
+                                            inst_type: Type::Int(0), // Replace with your default value
+                                            parameters: Vec::new(),
+                                        }];
+                                    }
+                                },
                                 parameters: vec![Instruction {
                                     inst_type: Type::Name(varname),
                                     parameters: Vec::new(),
-                                }]
+                                }],
                             };
-                            // We have now created this unholy abomination:
-                            /*
-                            Instruction
-                            |---inst_type
-                            |     `-Type::Int(xyz)
-                            `---parameters
-                                `-Instruction
-                                |---inst_type
-                                    |     `-Type::Name(xyz)
-                                    `---parameters
-                                    `-[]
-                            */
+                        
+                            // We have now created this unholy abomination...
                             instructions.push(instruction);
                         }
                             

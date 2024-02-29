@@ -1,3 +1,20 @@
+## 29/02/24
+
+- First compilation! All the first program did was put an integer on the heap.
+- Made the error messages cleaner by adding an extra space where needed to align everything
+  - Before:
+    ```
+    9 | code
+    10 | code
+    11 | code
+    ```
+  - Now:
+    ```
+     9 | code
+    10 | code
+    11 | code
+    ```
+
 ## 27/02/24
 
 - Created the assembly code blocks and a function in asm_generator.asm that replaces the "<>" in the asm blocks with the proper values.

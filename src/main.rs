@@ -1,4 +1,6 @@
 use std::fs::read_to_string;
+use std::fs::File;
+use std::fs;
 
 mod tokenizer;      // This is the code for the tokenizer; first step of compilation.
                     // Check `src/tokenizer.rs` for more info
@@ -17,7 +19,7 @@ mod error;          // This is the code for throwing errors.
                     // Check `src/error.rs` for more info
 
 // File path - Later the compiler should take this as a parameter.
-pub const FILEPATH: &str = "mylang.c";
+pub const FILEPATH: &str = "mylang";
 pub const OUTPUTPATH: &str = "output.asm";
 
 // From now on in comments, "the code" refers to the
@@ -33,22 +35,25 @@ fn main() {
     for line in read_to_string(FILEPATH).unwrap().lines() {
         code_lines.push(line.to_string());
     }
-    println!("Code: {:?} \n", code_lines);
+    //println!("Code: {:?} \n", code_lines);
 
     // Tokenize (and preprocess) the code. See `tokenize` function
     // (in tokenizer.rs) for more info
     let tokens = tokenizer::tokenize(code_lines);
-    println!("Tokens: {:?} \n", tokens);
+    //println!("Tokens: {:?} \n", tokens);
 
     let intermediate_representation = ir_generator::generate_ir(tokens);
-    println!("IR: {:?} \n", intermediate_representation);
+    //println!("IR: {:?} \n", intermediate_representation);
 
     let near_assembly_representation = nar_generator::generate_nar(intermediate_representation);
-    println!("NAR: {:?} \n", near_assembly_representation);
+    //println!("NAR: {:?} \n", near_assembly_representation);
 
     let assembly_output = asm_generator::generate_asm(near_assembly_representation);
-    println!("{:?} \n", assembly_output);
+    //println!("{:?} \n", assembly_output);
 
-    
-
+    // create the output file. Later this should also be passed as parameter.
+    let file_path: &str = "output.asm";
+    let _file = File::create(file_path);
+    fs::write(file_path, assembly_output).expect("Unable to write file");
+    println!("Program compiled!")
 }

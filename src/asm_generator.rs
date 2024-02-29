@@ -19,6 +19,12 @@ pub fn generate_asm(nar: NAR) -> String {
             NAI::CreatePointer(varname) => {
                 asm += &replace_values_in_file("create_bss_pointer.asm", vec![&varname]);
             }
+            NAI::DeclareExterns => {
+                asm += &replace_values_in_file("external.asm", vec![]);
+            }
+            NAI::EndProgram => {
+                asm += &replace_values_in_file("endprogram.asm", vec![]);
+            }
 
             _ => { todo!() }
         }
@@ -26,18 +32,32 @@ pub fn generate_asm(nar: NAR) -> String {
         return asm;
     }
 
+    // DATA
+    asm += "section .data\n" ;
     for x in nar.data {
-        asm += "section .data\n" ;
         asm += &generate_asm_block(x);
+        asm += "\n";
     }
+    asm += &generate_asm_block(NAI::DeclareExterns);
+    asm += "\n";
+    asm += "\n";
+
+    
+    // BSS
+    asm += "section .bss\n" ;
     for x in nar.bss {
-        asm += "section .bss\n" ;
         asm += &generate_asm_block(x);
+        asm += "\n";
     }
+    asm += "\n";
+
+    // MAIN
+    asm += "section .text\nglobal main\n\nmain:\n" ;
     for x in nar.main {
-        asm += "section .main\n" ;
         asm += &generate_asm_block(x);
+        asm += "\n\n";
     }
+    asm += &generate_asm_block(NAI::EndProgram);
 
     return asm;
 }

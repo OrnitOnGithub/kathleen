@@ -30,7 +30,7 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
         ',', '.', ':', ';',             // comma, period, colon, semicolon
         '+', '*', '/', '-', '=', '^',   // mathematical operators: plus, multiplication, 
                                         // division, minus, equals, power
-        ].iter().cloned().collect();
+    ].iter().cloned().collect();
 
     for line in lines {
         // Vector to hold the tokens of the current line
@@ -106,11 +106,10 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
         for (token_number, token) in line.iter().enumerate() {
             tokens.push(
                 Token {
-                    token        : token.clone(),
-                    line         : line_number,
-                    token_number : token_number,
-                }
-            )
+                    token: token.to_string(),
+                    line: line_number,
+                    token_number,
+            });
         }
     }
 

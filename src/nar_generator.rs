@@ -66,6 +66,9 @@ pub enum NAI {
     PrintReferenceTo(String),   // Dereference, (convert data type) and print
     Print(String),              // Print a constant str, defined in .data
     PrintLn,                    // Print a newline.
+
+    DeclareExterns,
+    EndProgram,
 }
 /// This is the near assembly representation struct.
 #[derive(Debug, Clone)]
