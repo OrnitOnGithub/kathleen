@@ -17,7 +17,8 @@ mod error;          // This is the code for throwing errors.
                     // Check `src/error.rs` for more info
 
 // File path - Later the compiler should take this as a parameter.
-pub static FILEPATH: &str = "mylang.c";
+pub const FILEPATH: &str = "mylang.c";
+pub const OUTPUTPATH: &str = "output.asm";
 
 // From now on in comments, "the code" refers to the
 // programming language this compiler compiles for.
@@ -47,5 +48,7 @@ fn main() {
 
     let assembly_output = asm_generator::generate_asm(near_assembly_representation);
     println!("{:?} \n", assembly_output);
+
+    
 
 }

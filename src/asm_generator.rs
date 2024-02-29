@@ -1,27 +1,13 @@
 use crate::nar_generator::{NAI,NAR};
 use std::fs;
 
-const asm_path: &str = "asm/nasm-x64/";
-
-const output_path: &str = "output.asm";
+const ASM_PATH: &str = "asm/nasm-x64/";
 
 pub fn generate_asm(nar: NAR) -> String {
 
     let mut asm: String = String::new();
 
-    for x in nar.data {
-        asm += "section .data\n" ;
-        asm += &generate_asm_block(x);
-    }
-    for x in nar.bss {
-        asm += "section .bss\n" ;
-        asm += &generate_asm_block(x);
-    }
-    for x in nar.main {
-        asm += "section .main\n" ;
-        asm += &generate_asm_block(x);
-    }
-
+    /// This function does its thing cant be fucked to document rn
     fn generate_asm_block(nai: NAI) -> String {
         let mut asm: String = String::new();
 
@@ -38,6 +24,19 @@ pub fn generate_asm(nar: NAR) -> String {
         }
 
         return asm;
+    }
+
+    for x in nar.data {
+        asm += "section .data\n" ;
+        asm += &generate_asm_block(x);
+    }
+    for x in nar.bss {
+        asm += "section .bss\n" ;
+        asm += &generate_asm_block(x);
+    }
+    for x in nar.main {
+        asm += "section .main\n" ;
+        asm += &generate_asm_block(x);
     }
 
     return asm;
@@ -58,7 +57,6 @@ pub fn generate_asm(nar: NAR) -> String {
 /// ```rust
 /// asm += &replace_values_in_file("print_constant.asm", vec!["1", "constantname"]);
 /// ```
-/// 
 /// asmpath/print_constant.asm:
 /// ```asm
 /// mov         rdx,    <>      ; length of the message
@@ -67,7 +65,6 @@ pub fn generate_asm(nar: NAR) -> String {
 /// mov         rax,    1
 /// syscall
 /// ```
-/// 
 /// here is what will get appended to `asm`:
 /// ```asm
 /// mov         rdx,    1      ; length of the message
@@ -79,14 +76,16 @@ pub fn generate_asm(nar: NAR) -> String {
 /// 
 fn replace_values_in_file(filepath: &str, values_to_replace: Vec<&str>) -> String {
 
-    let full_filepath: String = asm_path.to_owned()+filepath;
+    let full_filepath: String = ASM_PATH.to_owned()+filepath;
     let mut contents = fs::read_to_string(full_filepath)
         .expect("Should have been able to read that file. This problem is occurring in asm_generator:read_file()");
 
     let mut value_to_replace_index: usize = 0;
     for index in 0..contents.len()-1 {
         if contents.as_bytes()[index] == "<".as_bytes()[0] && contents.as_bytes()[index+1] == ">".as_bytes()[0] {
-            contents = contents[0..index].to_string() + values_to_replace[value_to_replace_index] + &contents[index+2..contents.len()].to_string();
+            contents = contents[0..index].to_string()
+                + values_to_replace[value_to_replace_index]
+                + &contents[index+2..contents.len()].to_string();
             value_to_replace_index += 1;
         }
     }
