@@ -1,3 +1,7 @@
+## 01/02/24
+
+- Made the errors nicer with the colored crate.
+
 ## 29/02/24
 
 - First compilation! All the first program did was put an integer on the heap.
