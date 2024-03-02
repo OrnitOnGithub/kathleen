@@ -1,3 +1,7 @@
+extern crate colored;
+
+use colored::*;
+
 use crate::FILEPATH;
 
 pub static mut ERROR_COUNT: usize = 0;
@@ -9,6 +13,8 @@ pub enum ErrorCode {
     /// Error code for any keyword that is not recognised
     UnknownKeyword,
     IncorrectTypeValuePassed,
+    LackingParameters,
+    ForgotSemicolon,
 }
 
 /// This function only prints the errors and does not cause a panic.
@@ -25,15 +31,25 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
     println!();
     match error_code {
         ErrorCode::UnknownKeyword => {
-            println!("Unkown token \"{}\" at line #{}", token.token, (token.line+1));
-            show_lines(token.line);
-            println!("Additional information: {}", extra_info);
+            println!("Unkown token {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
+            show_lines(token);
+            println!("Additional information: {}", extra_info.red());
         }
 
         ErrorCode::IncorrectTypeValuePassed => {
-            println!("Incorrect type of value \"{}\" passed at #{}", token.token, (token.line+1));
-            show_lines(token.line);
-            println!("Additional information: {}", extra_info);
+            println!("Incorrect type of value assigned to \"{}\" at line {}", token.token.italic(), (token.line+1).to_string().blue());
+            show_lines(token);
+            println!("Additional information: {}", extra_info.red());
+        }
+        ErrorCode::LackingParameters => {
+            println!("Incorrect amount of parameters for {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
+            show_lines(token);
+            println!("Additional information: {} {}", "Fatal error, IR generation cannot proceed, further errors will not be reported.".red(), extra_info.red());
+        }
+        ErrorCode::ForgotSemicolon => {
+            println!("You might have forgotten a semicolon at line {}", (token.line+1).to_string().blue());
+            show_lines(token);
+            println!("Additional information: {}", extra_info.red());
         }
     }
     println!();
@@ -50,7 +66,7 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
 /// have been printed by `print_error()`
 ///
 pub fn throw_errors() -> () {
-    unsafe { println!("Errors occurred: {}", ERROR_COUNT); }
+    unsafe { println!("{} {}", "Errors occurred:".red(), ERROR_COUNT.to_string().red()); }
     println!();
     unsafe {
         if ERROR_COUNT > 0 {
@@ -64,9 +80,11 @@ pub fn throw_errors() -> () {
 
 
 /// Show the lines around the problematic one
-fn show_lines(line: usize) -> () {
+fn show_lines(token: Token) -> () {
     // 9 10 11
     // 8 9 10
+
+    let mut line: usize = token.line;
 
     // Create a Vector for each line of the code.
     let mut lines = Vec::new();
@@ -101,7 +119,7 @@ fn show_lines(line: usize) -> () {
 
     }
 
-    println!("{} | {}", line_number_1, lines[line-1]);
-    println!("{} | {}", line_number_2, lines[line]);
-    println!("{} | {}", line_number_3, lines[line+1]);
+    println!("{} {} {}", line_number_1.blue(), "|".blue(), lines[line-1]);
+    println!("{} {} {}", line_number_2.blue(), "|".blue(), lines[line]);
+    println!("{} {} {}", line_number_3.blue(), "|".blue(), lines[line+1]);
 }

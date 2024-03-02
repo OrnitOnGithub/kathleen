@@ -1,11 +1,11 @@
 use std::vec;
 
-use crate::error::{self, print_error, throw_errors, ErrorCode, ERROR_COUNT}; // For throwing errors.
+use crate::error::{self, print_error, throw_errors, ErrorCode}; // For throwing errors.
 use crate::tokenizer::Token;
 
 /// This is a function that turns a Vector of Token structs into the first Vector of (intermediate) Instructions.
 /// It returns the first intermediate representation of two. This is the most abstracted one.
-pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
+pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
 
     // This is what a Token struct looks like btw:
     /*
@@ -37,6 +37,9 @@ pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
             }
 
             if index_of_semicolon == 0 {
+                if tokens.len() > 0 {
+                    print_error(ErrorCode::ForgotSemicolon, tokens[0].clone(), "");
+                }
                 break
             }
             let token: String = tokens[0].token.clone();
@@ -48,6 +51,11 @@ pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
                     // EXAMPLE: let varname bool = true;
                     // EXAMPLE: let varname int const = 1234;
                     // note: not handleing const yet
+
+                    if index_of_semicolon < 5 {
+                        print_error(ErrorCode::LackingParameters, tokens[0].clone(), "Let bindings work like this: let variable_name data_type = value;");
+                        break;
+                    }
                     
                     // tokens[1] (the second token) is the variable name.
                     let varname: String = tokens[1].token.clone();
@@ -163,9 +171,10 @@ pub fn generate_ir(mut tokens: Vec<Token>) -> Vec<Instruction> {
                 }
 
                 _ => {
-                    print_error(ErrorCode::UnknownKeyword, tokens[0].clone(), "")
+                    print_error(ErrorCode::UnknownKeyword, tokens[0].clone(), "This token is not a supported instruction.")
                 }   
             }
+            
             // end of loop here
             // delete all tokens before semicolon
             for _ in 0..index_of_semicolon+1 {
