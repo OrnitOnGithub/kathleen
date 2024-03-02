@@ -54,6 +54,6 @@ fn main() {
     // create the output file. Later this should also be passed as parameter.
     let file_path: &str = "output.asm";
     let _file = File::create(file_path);
-    fs::write(file_path, assembly_output).expect("Unable to write file");
+    fs::write(file_path, assembly_output).expect("Unable to write to file");
     println!("Program compiled!")
 }
