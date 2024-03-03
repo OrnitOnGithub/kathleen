@@ -1,28 +1,35 @@
 extern crate colored;
 
 use colored::*;
-
+use std::fs::read_to_string;
+use crate::tokenizer::Token;
 use crate::FILEPATH;
 
 pub static mut ERROR_COUNT: usize = 0;
+pub static mut WARNING_COUNT: usize = 0;
+const WARNING_COLOUR: CustomColor = CustomColor { r: 255, g: 200, b: 50};
 
-use std::fs::read_to_string;
-use crate::tokenizer::Token;
 /// used in the `throw_error()`
 pub enum ErrorCode {
     /// Error code for any keyword that is not recognised
     UnknownKeyword,
+    /// Error code for when an incorrect data type is passed, for example
+    /// `let banana int = "12";`
     IncorrectTypeValuePassed,
     LackingParameters,
     ForgotSemicolon,
+    VariableNotDefined,
 }
 
 /// This function only prints the errors and does not cause a panic.
 /// 
 /// `throw_errors` will actually cause the panic but only if
-/// `print_errors()` was called at least once
+/// `print_errors` was called at least once
 ///
 pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
+    
+    let mut is_warning: bool = false;   // If an error is only a warning, this will be set to
+                                    // true and the error count will not be incremented.
 
     if extra_info == "" {
         extra_info = "none";
@@ -49,13 +56,24 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
         ErrorCode::ForgotSemicolon => {
             println!("You might have forgotten a semicolon at line {}", (token.line+1).to_string().blue());
             show_lines(token);
+            println!("Additional information: {}", extra_info.custom_color(WARNING_COLOUR));
+            is_warning = true;
+        }
+        ErrorCode::VariableNotDefined => {
+            println!("Variable {} referenced before assignment at line {}", token.token.italic(), (token.line+1).to_string().blue());
+            show_lines(token);
             println!("Additional information: {}", extra_info.red());
         }
     }
     println!();
 
     unsafe {
-        ERROR_COUNT += 1;
+        if is_warning {
+            WARNING_COUNT += 1;
+        }
+        else {
+            ERROR_COUNT += 1;
+        }
     }
 }
 
@@ -66,6 +84,7 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
 /// have been printed by `print_error()`
 ///
 pub fn throw_errors() -> () {
+    unsafe { println!("{} {}", "Warnings:".custom_color(WARNING_COLOUR), WARNING_COUNT.to_string().custom_color(WARNING_COLOUR)); }
     unsafe { println!("{} {}", "Errors occurred:".red(), ERROR_COUNT.to_string().red()); }
     println!();
     unsafe {
@@ -79,12 +98,16 @@ pub fn throw_errors() -> () {
 }
 
 
-/// Show the lines around the problematic one
+/// Show the lines around the problematic one-
+/// ```
+///  9 |
+/// 10 | Something problematic here
+/// 11 |
+/// ```
+/// With nice colours too
 fn show_lines(token: Token) -> () {
-    // 9 10 11
-    // 8 9 10
-
-    let mut line: usize = token.line;
+    
+    let line: usize = token.line;
 
     // Create a Vector for each line of the code.
     let mut lines = Vec::new();
@@ -116,7 +139,6 @@ fn show_lines(token: Token) -> () {
     if digit_count_middle < digit_count_last {
         line_number_1 = " ".to_owned() + &(line-1).to_string();
         line_number_2 = " ".to_owned() + &(line).to_string();
-
     }
 
     println!("{} {} {}", line_number_1.blue(), "|".blue(), lines[line-1]);

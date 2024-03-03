@@ -108,15 +108,15 @@ pub enum Type {
 }
 ```
 
-Example of an instruction that prints a reference to something
+Example of an instruction that prints something
 ```
 Instruction
 |---inst_type
-|     `-Type::Print
+|     `-Type::PrintStr
 `---parameters
       `-Instruction
         |---inst_type
-        |     `-Type::ReferenceTo(XYZ)
+        |     `-Type::Name(XYZ)
         `---parameters
               `-[]
 ```

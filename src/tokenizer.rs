@@ -20,7 +20,7 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
     // SEPARATE TOKENS BY WHITESPACE AND SPECIAL CHARACTERS
 
     // A set of special characters to separate
-    let special_chars: HashSet<char> = [ // for clarity:
+    let special_chars: HashSet<char> = [// for clarity:
         '(', ')',                       // brackets
         '{', '}',                       // curly brackets
         '[', ']',                       // square brackets
@@ -74,6 +74,32 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
         // This is equal to adding one line to the vector
         tokenised_lines.push(tokens);
     }
+    
+    /*
+    // STRINGIFY!
+    // Bascially, turn "strings" into a single token.
+    // "\"", "hello", "there", "\"" -> "hello there"
+    let mut stringified_lines: Vec<Vec<String>> = Vec::new();
+    let mut is_string: bool = false;
+    for line in tokenised_lines.clone() {
+        let mut new_line: Vec<String> = Vec::new();
+        let mut new_token: String = String::new();
+        for token in line {
+            new_token += &token;
+            if token == "\"" { // if we encounter `"`
+            is_string = !is_string; // if false -> true, if true -> false
+        }
+        if !is_string {
+            new_line.push(new_token.clone());
+            new_token = String::new();
+        }
+    }
+    stringified_lines.push(new_line);
+    }
+    println!("{:?}", tokenised_lines);
+    let mut tokenised_lines = stringified_lines;
+    println!("{:?}", tokenised_lines);
+    */
 
     // REMOVE COMMENTS
 
@@ -119,7 +145,7 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    pub token: String,          // the token itself
-    pub line: usize,            // which line this at
-    pub token_number: usize,    // which token in the line this is (1st, 2nd...)
+    pub token: String,          // the token itself, for example "let"
+    pub line: usize,            // which line it is at
+    pub token_number: usize,    // which token in the line this is (0st, 1st, 2nd...)
 }

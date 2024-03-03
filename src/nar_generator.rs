@@ -1,4 +1,4 @@
-use crate::error::{print_error, ErrorCode, throw_errors}; // For throwing errors.
+//use crate::error::{print_error, ErrorCode, throw_errors}; // For throwing errors.
 use crate::ir_generator::{Instruction, Type};
 
 /// This function turns the IR into a near assembly representation. This is 
@@ -27,17 +27,26 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
                 bss.push( NAI::CreatePointer(varname.clone()) );
                 main.push( NAI::AllocateInt(varname.clone(), value) )
             }
-            
-            // Print
-            Type::Print => {
-                let name_struct: Type = instruction.parameters[0].inst_type.clone();
-                let varname: String = if let Type::ReferenceTo(s) = name_struct {
-                    s
-                } else {
-                    panic!("Unexpected enum variant");
-                };
-                main.push( NAI::PrintReferenceTo(varname) );
+
+            Type::ConstStr(value) => {
+                
             }
+            
+            // Print an integer
+            /*
+            Type::PrintInt(varname) => {
+                main.push( NAI::PrintInt(varname) );
+            }
+            */
+            
+            /*
+            Type::PrintConstStr(varname) => {
+                
+                //let length: usize = varname.len();
+                main.push( NAI::PrintConstStr(varname, length) );
+            }
+            */
+
             // Only print a newline.
             Type::PrintLn => {
                 main.push(NAI::PrintLn);
@@ -63,7 +72,8 @@ pub enum NAI {
     CreatePointer(String),      // Create a pointer in the .bss section to memory.
     AllocateInt(String, u64),   // Allocate a dword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
 
-    PrintReferenceTo(String),   // Dereference, (convert data type) and print
+    PrintInt(String),           // Print an integer
+    PrintConstStr(String, usize),    // Print a constant string. parameters are name of slice and length of slice.
     Print(String),              // Print a constant str, defined in .data
     PrintLn,                    // Print a newline.
 

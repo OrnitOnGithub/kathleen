@@ -25,7 +25,9 @@ pub fn generate_asm(nar: NAR) -> String {
             NAI::EndProgram => {
                 asm += &replace_values_in_file("endprogram.asm", vec![]);
             }
-
+            NAI::PrintConstStr(varname, length) => {
+                asm += &replace_values_in_file("print_constant.asm", vec![&length.to_string(), varname.as_str()])
+            }
             _ => { todo!() }
         }
 

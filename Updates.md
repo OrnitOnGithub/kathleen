@@ -1,3 +1,17 @@
+## 02-03/02/24
+
+- Started working on strings in the tokenizer, however current implementation sucks.
+
+- Currently working on re-doing the variable types.
+  - Constant integer
+  - Dynamic integer
+  - Constant string
+  - Dynamic string
+- The plan is:
+  - Have constant string printable
+  - Have dynamic string printable
+  - Have ints printable
+
 ## 01/02/24
 
 - Made the errors nicer with the colored crate.

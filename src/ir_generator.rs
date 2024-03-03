@@ -1,7 +1,34 @@
+use core::panic;
 use std::vec;
 
 use crate::error::{self, print_error, throw_errors, ErrorCode}; // For throwing errors.
 use crate::tokenizer::Token;
+
+/// Keep track of all variables
+#[derive(Clone)]
+struct Variable {
+    name: String,
+    var_type: Type,
+}
+static mut VARIABLE_LIST: Vec<Variable> = Vec::new();
+
+/// Check a variable's type. Used by IR generator and NAR generator for type-specific handling.
+fn get_var_type(token: Token) -> Type {
+
+    let mut var_found: bool = false;
+    unsafe {
+        for variable in VARIABLE_LIST.clone() {
+            if token.token == variable.name {
+                var_found = true;
+                return variable.var_type;
+            }
+        }
+        if !var_found {
+            print_error(ErrorCode::VariableNotDefined, token, "")
+        }
+    }
+    panic!("DEV: tried to check variable type of variable that does not exist.");
+}
 
 /// This is a function that turns a Vector of Token structs into the first Vector of (intermediate) Instructions.
 /// It returns the first intermediate representation of two. This is the most abstracted one.
@@ -45,22 +72,35 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
             let token: String = tokens[0].token.clone();
             
             match token.as_str() {
-                
-                "let" => {
-                    // This is a let binding. A variable is being defined.
+
+                "let" | "const" => {
+                    // This is a let binding or a constant creation. A variable is being defined.
                     // EXAMPLE: let varname bool = true;
                     // EXAMPLE: let varname int const = 1234;
-                    // note: not handleing const yet
+                    // EXAMPLE: const varname str = "hello";
 
+                    // check wether it is a constant. `is_constant` is used later throughout
+                    // the code, for example to know whether to define a `Str` or `ConstStr`.
+                    let mut is_constant = false;
+                    if token == "const" {
+                        is_constant = true;
+                    }
+
+                    // If the expression is less than 6 tokens long including the semicolon,
+                    // then it must be incorrect.
+                    // let varname int = 12 ;
+                    //  1     2     3  4  5 6
+                    //  0     1     2  3  4 5  <- if we start at 0, so for indices.
                     if index_of_semicolon < 5 {
                         print_error(ErrorCode::LackingParameters, tokens[0].clone(), "Let bindings work like this: let variable_name data_type = value;");
                         break;
                     }
-                    
+
+
                     // tokens[1] (the second token) is the variable name.
+                    // We store it for later use.
                     let varname: String = tokens[1].token.clone();
-                    // We will store it for later use.
-                    
+
                     // find where the (first) `=` is located, because we know everyhing after that is (a) value(s)
                     let mut index_of_equal: usize = 0;
                     for (index, token) in tokens.clone().iter().enumerate() {
@@ -69,38 +109,72 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                             break
                         }
                     }
-                    
+
+                    // match for the third token, which is the data type.  
                     match tokens[2].token.as_str() {
-                        // Now let's check what variable type we've got.
-                        // types: int, bool
-                        
+
+                        // We are creating an unsigned 64 bit integer.
+                        // TODO: support for operations after the equal.
+                        // we create something like this btw:
+                        /*
+                        Instruction
+                        |---inst_type
+                        |     `-Type::Int
+                        `---parameters
+                              `-Instruction
+                                |---inst_type
+                                |     `-Type::Name(XYZ)
+                                `---parameters
+                                      `-[]
+                         */
                         "int" => {
-                            // We found an int! Let's create the `Instruction` for it.
-                            // TODO: support for operations after the equal.
-                        
+
+                            /// This function returns the correct integer `Type` depending on whether
+                            /// is_constant is true or not. It is used later in the code to make creating
+                            /// The `Instruction` struct for integers or constant integers easier.
+                            /// 
+                            /// Return `ConstInt(value)` if int is constant, `Int(value)` otherwise.
+                            fn int_type(value: u64, is_constant: bool) -> Type {
+                                let mut int_type: Type = Type::Int(value);
+                                if is_constant {
+                                    int_type = Type::ConstInt(value);
+                                }
+                                return int_type;
+                            }
+                            
+                            // Return an instruction struct that defines either a ConstInt or an Int.
+                            //
                             let instruction: Instruction = Instruction {
                                 inst_type: match tokens[index_of_equal + 1].token.clone().as_str().parse::<u64>() {
-                                    Ok(value) => Type::Int(value),
-                                    Err(e) => {
-                                        error::print_error(ErrorCode::IncorrectTypeValuePassed, tokens[2].clone(), "Value passed was not an unsigned 64 bit integer.");
-                                        // You might want to return a default value or handle it differently based on your needs
+                                    Ok(value) => int_type(value, is_constant), // int_type returns Type::ConstInt if constant, Type::Int otherwise.
+                                    Err(_) => {
+                                        error::print_error(
+                                            ErrorCode::IncorrectTypeValuePassed,
+                                            tokens[2].clone(),
+                                            "Value passed was not an unsigned 64 bit integer."
+                                        );
+
                                         return vec![Instruction {
-                                            inst_type: Type::Int(0), // Replace with your default value
+                                            inst_type: Type::Int(0),
                                             parameters: Vec::new(),
                                         }];
                                     }
                                 },
                                 parameters: vec![Instruction {
-                                    inst_type: Type::Name(varname),
+                                    inst_type: Type::Name(varname.clone()),
                                     parameters: Vec::new(),
                                 }],
                             };
-                        
-                            // We have now created this unholy abomination...
+
                             instructions.push(instruction);
+                            unsafe { VARIABLE_LIST.push(Variable { name: varname.clone(), var_type: int_type(0, is_constant) }) }
+                        }
+
+                        "str" => {
+                            panic!("DEV: String not implemented yet!");
                         }
                             
-                            _ => {
+                        _ => {
                             print_error(ErrorCode::UnknownKeyword, tokens[2].clone(), "Unknown \
                             data type. The third token of a let binding is a data type.");
                         }
@@ -109,11 +183,13 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                 
                 "print" | "println" => {
 
+                    let varname: String = tokens[1].token.clone();
+
                     let mut print_line: bool = false;
                     if token == "println" {
                         print_line = true;
                     }
-                    
+
                     // I'll clean this up later
                     let mut index_of_open_bracket: usize = 0;
                     for (index, token) in tokens.clone().iter().enumerate() {
@@ -129,37 +205,57 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                             break
                         }
                     }
+
                     for index in index_of_open_bracket+1..index_of_closed_bracket {
-                        // Later, keep track of variable types so we know how to reference them accordingly.
-                        let is_referenced: bool = true; // temporary.
                         
-                        if is_referenced {
-                            let instruction: Instruction = Instruction {
-                                inst_type: Type::Print,
-                                parameters: vec![
-                                    Instruction {
-                                        inst_type: Type::ReferenceTo(tokens[index].token.clone()),
-                                        parameters: Vec::new(),
-                                    }
-                                ]
-                            };
-                            instructions.push(instruction);
+                        let var_type = get_var_type(tokens[index].clone());
+
+                        match var_type.clone() {
+
+                            Type::Int(int) | Type::ConstInt(int) => {
+
+                                // If the variable is constant, do PrintConstInt, otherwise do PrintInt
+                                let mut print_int_type: Type = Type::PrintInt(varname.clone());
+                                if var_type == Type::ConstInt(int) {
+                                    print_int_type = Type::PrintConstInt(varname.clone());
+                                }
+
+                                let instruction: Instruction = Instruction {
+                                    inst_type: print_int_type, // Either PrintConstInt or PrintInt
+                                    parameters: vec![
+                                        Instruction {
+                                            inst_type: Type::Name(tokens[index].token.clone()),
+                                            parameters: Vec::new(),
+                                        }
+                                    ]
+                                };
+                                instructions.push(instruction);
+                            }
+
+                            Type::Str(str) | Type::ConstStr(str) => {
+
+                                // If the variable is constant, do PrintConstStr, otherwise do PrintStr
+                                let mut print_str_type: Type = Type::PrintStr(varname.clone());
+                                if var_type == Type::ConstStr(str) {
+                                    print_str_type = Type::PrintConstStr(varname.clone());
+                                }
+
+                                let instruction: Instruction = Instruction {
+                                    inst_type: print_str_type, // Either PrintConstStr or PrintStr
+                                    parameters: vec![
+                                        Instruction {
+                                            inst_type: Type::Name(tokens[index].token.clone()),
+                                            parameters: Vec::new(),
+                                        }
+                                    ]
+                                };
+                                instructions.push(instruction);
+                            }
+
+                            _ => {
+                                todo!("DEV: Tried to print non-implemented data type");
+                            }
                         }
-                        else {
-                            todo!();
-                        }
-                        // Here we have created this:
-                        /*
-                        Instruction
-                        |---inst_type
-                        |     `-Type::Print
-                        `---parameters
-                            `-Instruction
-                            |---inst_type
-                                |     `-Type::ReferenceTo(XYZ)
-                                `---parameters
-                                `-[]
-                        */
                     }
                     if print_line {
                         let instruction: Instruction = Instruction {
@@ -206,12 +302,10 @@ pub struct Instruction {
 /// including definitions for sections like `.data`, loop
 /// constructs, conditions, functions,
 /// constants, and various data types.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Type {
 
-    Function,           // The start of the function
-    FunctionCall,       // To call the function
-    FunctionReturn,     // To exit the function
+    Function,
 
     Loop,
     LoopBreak,
@@ -219,20 +313,17 @@ pub enum Type {
     Condition,          // Define the evaluation
     ConditionTrue,      // Where to go if TRUE Basically
     ConditionFalse,     // Where to go if FALSE
-    ConditionExitPoint, // Basically ret, same as function return
     
     Name(String),
-    List,
-    Static,             // Lifetime = whole execution, it is mutable though
     Int(u64),
-    Bool(bool),
-    Float(f32),
-    String(String),
+    ConstInt(u64),
+    Str(String),
+    ConstStr(String),
 
-    Print,
+    PrintInt(String),
+    PrintConstInt(String),
+    PrintStr(String),
+    PrintConstStr(String),
     PrintLn,
     ReferenceTo(String),// Like name but we put [] around it in assembly
-    
-    Undefined,          // Testing purposes
-    Error,
 }

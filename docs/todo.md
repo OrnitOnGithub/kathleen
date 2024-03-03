@@ -3,7 +3,7 @@
   - [x] Have them turn into the IR
     - [x] `let`
     - [ ] `print`
-      - [x] Print static strings (slices)
+      - [ ] Print static strings (slices)
       - [ ] Print dynamic strings
       - [ ] Print integers
   - [x] Have the program compile from IR to ASM
@@ -15,9 +15,10 @@
   - [x] Reorganise `random-non-code` and the whole project overall
   - [ ] Write a proper README
   - [ ] Work on document/report thingy
-- [ ] Make errors look nicer, with colorize crate
+- [x] Make errors look nicer, with colorize crate
 - [ ] Keep track of all existing variables, for both static vs ref and error handling reasons
-- [ ] Add `bool`s and `drop`
+- [ ] Add `drop`
+- [ ] Add `bool`s
 - [ ] Add mathematical operators
 - [ ] Add `fn` and `return`
 - [ ] Add `loop` and `break`

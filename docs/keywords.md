@@ -4,10 +4,10 @@ A definition of all keywords
 
 ```
 let
+const
 drop
 bool
 int
-slice
 str
 print
 loop

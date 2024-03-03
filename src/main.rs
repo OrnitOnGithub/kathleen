@@ -43,7 +43,7 @@ fn main() {
     //println!("Tokens: {:?} \n", tokens);
 
     let intermediate_representation = ir_generator::generate_ir(tokens);
-    //println!("IR: {:?} \n", intermediate_representation);
+    println!("IR: {:?} \n", intermediate_representation);
 
     let near_assembly_representation = nar_generator::generate_nar(intermediate_representation);
     //println!("NAR: {:?} \n", near_assembly_representation);
