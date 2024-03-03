@@ -1,9 +1,14 @@
 - [x] Design an IR
-- [ ] Get `let` and `print` to compile
+- [ ] Get `let`, `const` and `print` to compile
   - [x] Have them turn into the IR
-    - [x] `let`
+    - [ ] `let`
+      - [x] int
+      - [ ] str
+    - [ ] `const`
+      - [ ] int
+      - [ ] str
     - [ ] `print`
-      - [ ] Print static strings (slices)
+      - [ ] Print static strings
       - [ ] Print dynamic strings
       - [ ] Print integers
   - [x] Have the program compile from IR to ASM
