@@ -48,4 +48,4 @@ All documentation and information can either be found in the [code itself](src/m
 
 ## License & Legal
 
-This project is licenced under the MIT license. TLDR: This means you are free to copy, use and distribute this program as long as you include the `LICENSE` file in your own project.
+This project is licenced under the MIT license. TLDR: This means you are free to copy, use and distribute this program as long as you include the `LICENSE` in your own project.
