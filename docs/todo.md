@@ -1,31 +1,26 @@
+This is a temporary TODO that will be replaced later.
+
 - [x] Design an IR
+- [ ] Fix the tokenizer to correctly build strings
 - [ ] Get `let`, `const` and `print` to compile
-  - [x] Have them turn into the IR
-    - [ ] `let`
-      - [x] int
-      - [ ] str
-    - [ ] `const`
-      - [ ] int
-      - [ ] str
-    - [ ] `print`
-      - [ ] Print static strings
-      - [ ] Print dynamic strings
-      - [ ] Print integers
-  - [x] Have the program compile from IR to ASM
-    - [x] Create a "second IR" that is just 1-to-1 IR/ASM instructions
-    - [x] Create list of small ASM blocks
-    - [x] Generate the ASM
-    - [x] Compile
-- [ ] Celebrate first compilation
-  - [x] Reorganise `random-non-code` and the whole project overall
-  - [ ] Write a proper README
-  - [ ] Work on document/report thingy
+  - [x] Keep track of all existing variables, for both static vs ref and error handling reasons
+  - [ ] `let`
+    - [x] int | IR, NAR and ASM work
+    - [ ] str
+  - [ ] `const`
+    - [ ] int
+    - [ ] str
+  - [ ] `print`
+    - [ ] Print static strings
+    - [ ] Print dynamic strings
+    - [ ] Print integers
+- [ ] Write a proper README
+- [ ] Work on document/report thingy
 - [x] Make errors look nicer, with colorize crate
-- [ ] Keep track of all existing variables, for both static vs ref and error handling reasons
+- [ ] Make release / package?
 - [ ] Add `drop`
-- [ ] Add `bool`s
 - [ ] Add mathematical operators
+- [ ] Add `bool`s
 - [ ] Add `fn` and `return`
 - [ ] Add `loop` and `break`
 - [ ] Add `if` and `else` if I'm feeling generous
-- [ ] Make release / package?
