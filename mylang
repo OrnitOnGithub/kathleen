@@ -1,3 +1,4 @@
+// Small test program
 const hello str = "Hello world";
 print(hello);
 print(hello);
