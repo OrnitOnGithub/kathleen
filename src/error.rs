@@ -3,7 +3,8 @@ extern crate colored;
 use colored::*;
 use std::fs::read_to_string;
 use crate::tokenizer::Token;
-use crate::FILEPATH;
+use crate::FILEPATH_ARG;
+use std::env;
 
 pub static mut ERROR_COUNT: usize = 0;
 pub static mut WARNING_COUNT: usize = 0;
@@ -19,6 +20,8 @@ pub enum ErrorCode {
     LackingParameters,
     ForgotSemicolon,
     VariableNotDefined,
+    MissingCommandLineArgument,
+    InvalidFile,
 }
 
 /// This function only prints the errors and does not cause a panic.
@@ -64,6 +67,14 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
             show_lines(token);
             println!("Additional information: {}", extra_info.red());
         }
+        ErrorCode::MissingCommandLineArgument => {
+            println!("Missing command line arguments");
+            println!("Additional information: {}", extra_info.red());
+        }
+        ErrorCode::InvalidFile => {
+            println!("Invalid file.");
+            println!("Additional information: {}", extra_info.red());
+        }
     }
     println!();
 
@@ -106,6 +117,10 @@ pub fn throw_errors() -> () {
 /// ```
 /// With nice colours too
 fn show_lines(token: Token) -> () {
+
+    // get the file path
+    let args: Vec<String> = env::args().collect();
+    let file_path = &args[FILEPATH_ARG];
     
     let line: usize = token.line;
 
@@ -113,7 +128,7 @@ fn show_lines(token: Token) -> () {
     let mut lines = Vec::new();
     // Iterate through the lines, add to Vector
     lines.push(String::from(" "));
-    for line in read_to_string(FILEPATH).unwrap().lines() {
+    for line in read_to_string(file_path).unwrap().lines() {
         lines.push(line.to_string());
     }
     lines.push(String::from(" "));

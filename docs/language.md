@@ -36,7 +36,7 @@ Defines a 64 bit integer.
 
 Prints varname1 and varname2 consecutively, without appending a newline.
 
-## PrintLn
+## Print Line
 
 `println(varname1 varname2);` or `println();`
 

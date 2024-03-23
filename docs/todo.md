@@ -1,20 +1,23 @@
 This is a temporary TODO that will be replaced later.
 
 - [x] Design an IR
-- [ ] Fix the tokenizer to correctly build strings
+- [x] Fix the tokenizer to correctly build strings
+  - [ ] ISSUE: if we have a variable called `something`, printing `"something"` would print the variable instead of the string `"something"`.
 - [ ] Get `let`, `const` and `print` to compile
   - [x] Keep track of all existing variables, for both static vs ref and error handling reasons
   - [ ] `let`
-    - [x] int | IR, NAR and ASM work
+    - [x] int
     - [ ] str
   - [ ] `const`
     - [ ] int
-    - [ ] str
-  - [ ] `print`
-    - [ ] Print static strings
+    - [x] str
+  - [ ] `print` and `println`
+    - [x] Print static strings
     - [ ] Print dynamic strings
     - [ ] Print integers
-- [ ] Write a proper README
+    - [ ] Print strings defined inside the print itself, like `print("Hello World!")`
+    - [ ] Fix printing too many newlines issue
+- [x] Write a proper README
 - [ ] Work on document/report thingy
 - [x] Make errors look nicer, with colorize crate
 - [ ] Make release / package?

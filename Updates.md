@@ -1,3 +1,14 @@
+## 23/03/24
+
+- Embedded all files into the compiled binary. The program can now access `asm/nasm-x64-linux/*` even when run outside of the project directory.
+- Added two errors in `error.rs` and used them in `main.rs` for handling:
+  - Missing command line argument: file path
+  - Provided file does not exist
+
+## 04-16/03/24
+
+- Constant strings, printing of constant strings and printline finally work.
+
 ## 02-03/02/24
 
 - Started working on strings in the tokenizer, however current implementation sucks.

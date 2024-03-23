@@ -1,23 +1,24 @@
 ```
-   ___             _ _   _     
-  / _ \ _ __ _ __ (_) |_( )___ 
- | | | | '__| '_ \| | __|// __|
- | |_| | |  | | | | | |_  \__ \
-  \___/|_|  |_| |_|_|\__| |___/
-   COMPILER
+  ___             _ _   _     
+ / _ \ _ __ _ __ (_) |_( )___ 
+| | | | '__| '_ \| | __|// __|
+| |_| | |  | | | | | |_  \__ \
+ \___/|_|  |_| |_|_|\__| |___/
+  COMPILER
 ```
+<div aria-label="Ornit's compiler"><p aria-hidden="true"></p></div> <!-- This is for screen readers -->
 
-This is a small compiler that is in the works. The goal of this project is to make a relatively simple piece of code that generates an assembly output for x64 linux netwide assembler.
+This is a small compiler that is in the works. The goal of this project is to make a relatively simple piece of code that generates an assembly output for x64 linux netwide assembler out of a made up language.
 
 ## Try it
 
-Currently the project is still in development, so there are no releases or packages to use, nor does the program behave as a CLI utility yet. So to get anything to run you must do it yourself.
+There are no releases yet so to try this program you must build it yourself.
 - Linux x64 required
 - Install NASM and GCC
 - Clone this repository
-- Write code in `mylang` file.
-- Run with `cargo run` for example to create assembly output
-- Run `./runoutput.sh` to assemble, link and run the assembly file provided by the compiler.
+- Write your code in a file
+- Run with `cargo run -- <path/to/code>` or `cargo build && ./<path/to/biary> <path/to/code>`
+- Run the program you created with `./output`
 
 ## Language
 
@@ -25,27 +26,22 @@ To learn about the language's syntax or anything related to writing in it, check
 
 ## Issues
 
-Please do not create any issues this right not, it is too early on in development.
+If you are having trouble, or if something is unclear, you can create an issue and ask for help using the quesition / documentation issue template.
 
-If you encounter any issues using this program, create a github issue and please provide:
-- The compiler's full output
-- The code you wrote
-- `output.asm` if it was a runtime issue
-- Information about your system
-- Any other information that may be need to recreate this issue. If the issue cannot be recreated, reporting it is useless.
+If you encounter any issues using this program, create a github issue and use the bug report template.
 
-If you want to propose any suggestions you are free to do so, especially if you provide something detailed.
+If you want to propose any suggestions you are free to do so, you can use the feature request template.
 
 If you want to try and solve an issue yourself, check out [Contribute](##contribute)
 
 ## Contribute
 
-As of now I want to work on this by myself. Once the language will have taken its basic shape I will accept contributions.
+As of now I want to work on this by myself. Once the language will have taken its basic shape I will accept contributions, and any help will be greatly appreciated.
 
 ## Documentation
 
-All documentation and information can either be found in the [code itself](src/main.rs), or in the [docs directory](/docs/) for higher-level information.
+All documentation and information can either be found in the [code itself](src/main.rs), or in the [`docs` directory](/docs/) for higher-level information.
 
 ## License & Legal
 
-This project is licenced under the MIT license. TLDR: This means you are free to copy, use and distribute this program as long as you include the `LICENSE` in your own project.
+This project is licenced under the MIT license. In short, this means you are free to copy, use and distribute this program as long as you include the `LICENSE` in your own project.

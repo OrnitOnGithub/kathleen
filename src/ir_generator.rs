@@ -171,7 +171,28 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                         }
 
                         "str" => {
-                            panic!("DEV: String not implemented yet!");
+                            /// Same as `int_type` but with str.
+                            fn str_type(value: String, is_constant: bool) -> Type {
+                                let mut int_type: Type = Type::Str(value.clone());
+                                if is_constant {
+                                    int_type = Type::ConstStr(value);
+                                }
+                                return int_type;
+                            }
+
+                            let instruction: Instruction = Instruction {
+                                inst_type: str_type(tokens[index_of_equal+1].token.clone(), is_constant),
+                                parameters: vec![
+                                    Instruction {
+                                        inst_type: Type::Name(varname.clone()),
+                                        parameters: Vec::new(),
+                                    },
+                                ]
+                            };
+
+                            instructions.push(instruction);
+                            unsafe { VARIABLE_LIST.push(Variable { name: varname, var_type: str_type(String::new(), is_constant) })}
+
                         }
                             
                         _ => {
@@ -183,7 +204,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                 
                 "print" | "println" => {
 
-                    let varname: String = tokens[1].token.clone();
+                    //let varname: String = tokens[1].token.clone(); // WHAT???
 
                     let mut print_line: bool = false;
                     if token == "println" {
@@ -206,9 +227,11 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                         }
                     }
 
-                    for index in index_of_open_bracket+1..index_of_closed_bracket {
+                    for varname_index in index_of_open_bracket+1..index_of_closed_bracket {
+
+                        let varname = tokens[varname_index].token.clone();
                         
-                        let var_type = get_var_type(tokens[index].clone());
+                        let var_type = get_var_type(tokens[varname_index].clone());
 
                         match var_type.clone() {
 
@@ -224,7 +247,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                                     inst_type: print_int_type, // Either PrintConstInt or PrintInt
                                     parameters: vec![
                                         Instruction {
-                                            inst_type: Type::Name(tokens[index].token.clone()),
+                                            inst_type: Type::Name(tokens[varname_index].token.clone()),
                                             parameters: Vec::new(),
                                         }
                                     ]
@@ -242,12 +265,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
 
                                 let instruction: Instruction = Instruction {
                                     inst_type: print_str_type, // Either PrintConstStr or PrintStr
-                                    parameters: vec![
-                                        Instruction {
-                                            inst_type: Type::Name(tokens[index].token.clone()),
-                                            parameters: Vec::new(),
-                                        }
-                                    ]
+                                    parameters: vec![]
                                 };
                                 instructions.push(instruction);
                             }
@@ -323,7 +341,6 @@ pub enum Type {
     PrintInt(String),
     PrintConstInt(String),
     PrintStr(String),
-    PrintConstStr(String),
+    PrintConstStr(String), // String = name of the variable to print
     PrintLn,
-    ReferenceTo(String),// Like name but we put [] around it in assembly
 }

@@ -7,17 +7,20 @@ use std::collections::HashSet;
 /// - It appends every line (Which is now a vector of tokens) to another vector.
 ///     - The index of the line in this vector is also its line number - 1.
 /// - It removes all comments
+/// - It returns a Vector of `Token` structs.
 /// 
-/// We get an end result like this:
-/// ```
-///  //line 1       //line 2
-/// [["Hello"], ["Hi", "there"]]
+/// ```rust
+/// pub struct Token {
+///     pub token: String,          // the token itself, for example "let"
+///     pub line: usize,            // which line it is at
+///     pub token_number: usize,    // which token in the line this is (0st, 1st, 2nd...)
+/// }
 /// ```
 pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
     let mut tokenised_lines: Vec<Vec<String>> = Vec::new();
 
-    // SEPARATE TOKENS BY WHITESPACE AND SPECIAL CHARACTERS
+    // SEPARATE TOKENS BY WHITESPACE AND SPECIAL CHARACTERS.
 
     // A set of special characters to separate
     let special_chars: HashSet<char> = [// for clarity:
@@ -25,7 +28,6 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
         '{', '}',                       // curly brackets
         '[', ']',                       // square brackets
         '<', '>',                       // smaller and greater signs
-        '\'', '"',                      // apostrophe and quotation mark
         '!', '|', '&',                  // exclamation mark, or operator, and operator
         ',', '.', ':', ';',             // comma, period, colon, semicolon
         '+', '*', '/', '-', '=', '^',   // mathematical operators: plus, multiplication, 
@@ -38,33 +40,52 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
         // String to hold the current token
         let mut token = String::new();
 
+        let mut is_string: bool = false;
+
         // Iterate through every character
         for ch in line.chars() {
-            // If that character is a space, add the token variable
-            // the tokens vector and clear the token variable
-            if ch.is_whitespace() {
-                if !token.is_empty() { // Sometimes there was nothing here before
-                    tokens.push(token);
-                }
-                token = String::new();
+
+            // " Marks either the end or the start of a string. If this character appears,
+            // it is to be ignored and is_string variable gets inverted.
+            if ch == '"' {
+                is_string = !is_string;
             }
-            // If the character is a special token, add the token variable
-            // to the tokens vector, as well as the special character as
-            // another token.
-            else if special_chars.contains(&ch) {
-                if !token.is_empty() {
-                    tokens.push(token);
-                }
-                token = String::new();
-                tokens.push(ch.to_string())
-            }
-            // Otherwise, it is just a normal character part of a normal word,
-            // so just push it to the token variable.
             else {
-                token.push(ch);
+                // If we are not dealing with a string, standard separation
+                // logic applies.
+                if !is_string {
+                    // If that character is a space, add the token variable
+                    // the tokens vector and clear the token variable
+                    if ch.is_whitespace() {
+                        if !token.is_empty() { // Sometimes there was nothing here before
+                            tokens.push(token);
+                        }
+                        token = String::new();
+                    }
+                    // If the character is a special token, add the token variable
+                    // to the tokens vector, as well as the special character as
+                    // another token.
+                    else if special_chars.contains(&ch) {
+                        if !token.is_empty() {
+                            tokens.push(token);
+                        }
+                        token = String::new();
+                        tokens.push(ch.to_string())
+                    }
+                    // Otherwise, it is just a normal character part of a normal word,
+                    // so just push it to the token variable.
+                    else {
+                        token.push(ch);
+                    }
+                }
+                // If we are indeed dealing with a string, push the character
+                // no matter what.
+                else {
+                    token.push(ch);
+                }
             }
         }
-
+            
         // If the last token is not empty, push it to the tokens vector
         if !token.is_empty() {
             tokens.push(token);

@@ -1,7 +1,9 @@
 use crate::nar_generator::{NAI,NAR};
-use std::fs;
+use rust_embed::RustEmbed;
 
-const ASM_PATH: &str = "asm/nasm-x64/";
+#[derive(RustEmbed)]
+#[folder = "asm/nasm-x64-linux/"]
+struct AssemblyDirEmbed;
 
 pub fn generate_asm(nar: NAR) -> String {
 
@@ -12,9 +14,10 @@ pub fn generate_asm(nar: NAR) -> String {
         let mut asm: String = String::new();
 
         match nai {
-
             NAI::AllocateInt(varname, int) => {
-                asm += &replace_values_in_file("allocate_int.asm", vec![varname.as_str(), &int.to_string()])
+                asm += &replace_values_in_file(
+                    "allocate_int.asm",
+                    vec![varname.as_str(), &int.to_string()])
             }
             NAI::CreatePointer(varname) => {
                 asm += &replace_values_in_file("create_bss_pointer.asm", vec![&varname]);
@@ -25,8 +28,21 @@ pub fn generate_asm(nar: NAR) -> String {
             NAI::EndProgram => {
                 asm += &replace_values_in_file("endprogram.asm", vec![]);
             }
-            NAI::PrintConstStr(varname, length) => {
-                asm += &replace_values_in_file("print_constant.asm", vec![&length.to_string(), varname.as_str()])
+            NAI::DefineConstStr(name, value, length) => {
+                asm += &replace_values_in_file(
+                    "define_const_str.asm",
+                    vec![&name.to_string(), &value.to_string(), &name.to_string(), &length.to_string()]
+                )
+            }
+            NAI::PrintConstStr(varname) => {
+                asm += &replace_values_in_file(
+                    "print_constant_string.asm",
+                    vec![&varname, varname.as_str()])
+            }
+            NAI::PrintLn => {
+                asm += &replace_values_in_file(
+                    "println.asm",
+                    vec![])
             }
             _ => { todo!() }
         }
@@ -73,7 +89,8 @@ pub fn generate_asm(nar: NAR) -> String {
 /// This function iterates through the contents of the file until it finds "<>"
 /// and replaces those two characters with a value from `values_to_replace`.
 /// Next time in encounters "<>" it will replace it with the next item in
-/// `values_to_replace`. It then returns the new edited file contents
+/// `values_to_replace`. It then returns the new edited file contents. This
+/// function is also quite unsafe.
 ///
 /// Here's an example usage of the function:
 /// ```rust
@@ -98,17 +115,24 @@ pub fn generate_asm(nar: NAR) -> String {
 /// 
 fn replace_values_in_file(filepath: &str, values_to_replace: Vec<&str>) -> String {
 
-    let full_filepath: String = ASM_PATH.to_owned()+filepath;
-    let mut contents = fs::read_to_string(full_filepath)
-        .expect("Should have been able to read that file. This problem is occurring in asm_generator:read_file()");
+    // Read the embedded directory (gets compiled into the project) + filepath as a String
+    let file = AssemblyDirEmbed::get(filepath).expect("File not found");
+    let file_content = std::str::from_utf8(file.data.as_ref()).expect("Failed to convert file data to string");
+    let mut contents = file_content.to_string();
+    
 
+    // I believe there is a much simpler way to do this in Rust, but I'll keep my own code for funsies
     let mut value_to_replace_index: usize = 0;
-    for index in 0..contents.len()-1 {
-        if contents.as_bytes()[index] == "<".as_bytes()[0] && contents.as_bytes()[index+1] == ">".as_bytes()[0] {
-            contents = contents[0..index].to_string()
+    for _ in 0..values_to_replace.len() {   // This for loop is a duct-tape solution. For some reason this didn't actually
+                                            // replace all the "<>" in the file, only like the first two
+        for index in 0..contents.len()-1 {
+            if contents.as_bytes()[index] == "<".as_bytes()[0] && contents.as_bytes()[index+1] == ">".as_bytes()[0] {
+                contents = contents[0..index].to_string()
                 + values_to_replace[value_to_replace_index]
                 + &contents[index+2..contents.len()].to_string();
-            value_to_replace_index += 1;
+                value_to_replace_index += 1;
+                break // part of the aforementioned duct-tape solution
+            }
         }
     }
     return contents;

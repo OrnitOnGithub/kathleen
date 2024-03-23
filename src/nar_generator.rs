@@ -5,9 +5,9 @@ use crate::ir_generator::{Instruction, Type};
 /// a set of one-to-one instructions that later get turned into blocks of
 /// assembly code.
 pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
-    let mut data: Vec<NAI> = Vec::new();    // The .data section, where constants and pointers are defined.
+    let mut data: Vec<NAI> = Vec::new();    // The .data section, where constants are defined.
     let mut bss: Vec<NAI> = Vec::new();     // The .bss section, mainly used to store heap pointers
-    let mut main: Vec<NAI> = Vec::new();    // The .main section, called in .text
+    let mut main: Vec<NAI> = Vec::new();    // The main label, called in .text section
 
     for instruction in instructions {
         match instruction.inst_type {
@@ -21,7 +21,7 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
                 let varname: String = if let Type::Name(s) = name_struct {
                     s
                 } else {
-                    panic!("Unexpected enum variant");
+                    panic!("DEV: Unexpected enum variant");
                 };
 
                 bss.push( NAI::CreatePointer(varname.clone()) );
@@ -29,7 +29,14 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
             }
 
             Type::ConstStr(value) => {
-                
+                let name_struct: Type = instruction.parameters[0].inst_type.clone();
+                let varname: String = if let Type::Name(s) = name_struct {
+                    s
+                } else {
+                    panic!("DEV: Unexpected enum variant");
+                };
+
+                data.push(NAI::DefineConstStr(varname, value.clone(), value.len()))
             }
             
             // Print an integer
@@ -38,14 +45,9 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
                 main.push( NAI::PrintInt(varname) );
             }
             */
-            
-            /*
             Type::PrintConstStr(varname) => {
-                
-                //let length: usize = varname.len();
-                main.push( NAI::PrintConstStr(varname, length) );
+                main.push( NAI::PrintConstStr(varname) );
             }
-            */
 
             // Only print a newline.
             Type::PrintLn => {
@@ -53,7 +55,7 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
             }
 
             _ => {
-                println!("DEV: Not an implemented instruction yet")
+                panic!("DEV: NAR: Not an implemented instruction yet: {:?}", instruction);
             }
         }
     }
@@ -69,11 +71,13 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
 /// turned into an assembly block of code.
 #[derive(Debug, Clone)]
 pub enum NAI {
-    CreatePointer(String),      // Create a pointer in the .bss section to memory.
+    CreatePointer(String),      // Create a pointer in the .bss section to memory. (For a qword of data)
     AllocateInt(String, u64),   // Allocate a dword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
+    DefineConstStr(String, String, usize), // Define a constant string's name and value, also define its size (for easier printing)
+    //             name    value   size
 
     PrintInt(String),           // Print an integer
-    PrintConstStr(String, usize),    // Print a constant string. parameters are name of slice and length of slice.
+    PrintConstStr(String),      // Print a constant string. String = name of variable.
     Print(String),              // Print a constant str, defined in .data
     PrintLn,                    // Print a newline.
 
