@@ -5,11 +5,16 @@ use rust_embed::RustEmbed;
 #[folder = "asm/nasm-x64-linux/"]
 struct AssemblyDirEmbed;
 
+/// This function takes a near assembly representation `NAR` as its single parameter,
+/// and returns a String. This string is a conversion of the NAR into assembly.
+/// 
+/// The function uses and replaces values in the assembly code found in `asm/` to
+/// create a new assembly program.
 pub fn generate_asm(nar: NAR) -> String {
 
     let mut asm: String = String::new();
 
-    /// This function does its thing cant be fucked to document rn
+    /// Turns a near assembly instruction `NAI` into an assembly code block.
     fn generate_asm_block(nai: NAI) -> String {
         let mut asm: String = String::new();
 
@@ -90,7 +95,8 @@ pub fn generate_asm(nar: NAR) -> String {
 /// and replaces those two characters with a value from `values_to_replace`.
 /// Next time in encounters "<>" it will replace it with the next item in
 /// `values_to_replace`. It then returns the new edited file contents. This
-/// function is also quite unsafe.
+/// function is also quite unsafe, and easily causes panics if badly
+/// implemented. A better solution is probably needed.
 ///
 /// Here's an example usage of the function:
 /// ```rust
@@ -112,7 +118,6 @@ pub fn generate_asm(nar: NAR) -> String {
 /// mov         rax,    1
 /// syscall
 /// ```
-/// 
 fn replace_values_in_file(filepath: &str, values_to_replace: Vec<&str>) -> String {
 
     // Read the embedded directory (gets compiled into the project) + filepath as a String

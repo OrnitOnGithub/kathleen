@@ -1,7 +1,9 @@
-use std::fs::read_to_string;
 use std::process::Command;
-use std::fs::File;
+
 use std::env;
+
+use std::fs::read_to_string;
+use std::fs::File;
 use std::fs;
 
 use crate::error::throw_errors;
@@ -9,7 +11,6 @@ use crate::error::print_error;
 use crate::tokenizer::Token;
 
 extern crate colored;
-
 use colored::*;
 
 mod tokenizer;      // This is the code for the tokenizer; first step of compilation.
@@ -99,7 +100,6 @@ fn main() {
     //println!("{:?}", link_output);
 
     let compilation_successful: &str = "\nCompilation successful! Run the output binary with `./output`";
-
     println!("{}", compilation_successful.green());
 
 }
