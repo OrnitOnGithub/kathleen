@@ -5,6 +5,7 @@ use std::fs::read_to_string;
 use crate::tokenizer::Token;
 use crate::FILEPATH_ARG;
 use std::env;
+use std::process;
 
 pub static mut ERROR_COUNT: usize = 0;
 pub static mut WARNING_COUNT: usize = 0;
@@ -24,9 +25,9 @@ pub enum ErrorCode {
     InvalidFile,
 }
 
-/// This function only prints the errors and does not cause a panic.
+/// This function only prints the errors and does not cause exiting the program.
 /// 
-/// `throw_errors` will actually cause the panic but only if
+/// `throw_errors` will actually cause the exit but only if
 /// `print_errors` was called at least once
 ///
 pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
@@ -88,10 +89,26 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
     }
 }
 
-/// This function causes a panic if errors occured.
+/// This function shows a help menu with all possible
+/// arguments. Never returns as it causes an exit.
+pub fn print_help() -> ! {
+    println!("{}", "HELP".green());
+    println!("{}", "---------".green());
+    println!("Usage: {}", "compiler <arg1> <arg2>".italic().green());
+    println!("Argument 1:");
+    println!("    - {}", "path to file to compile");
+    println!("    - {}", "help".green());
+    println!("Argument 2:");
+    println!("    - {}", "name of output file");
+    println!("    - {} {}", "nothing, sets output file name to", "output".green());
+    println!();
+    process::exit(1);
+}
+
+/// This function causes an exit if errors occured.
 /// (if `print_errors()` was called)
 /// 
-/// Before this panic, if errors occurred, they will already
+/// Before this exit, if errors occurred, they will already
 /// have been printed by `print_error()`
 ///
 pub fn throw_errors() -> () {
@@ -100,14 +117,13 @@ pub fn throw_errors() -> () {
     println!();
     unsafe {
         if ERROR_COUNT > 0 {
-            panic!("The intermediate representation could not be generated due to the above errors")
+            process::exit(1);
         }
         else {
             println!("No issues found with program. Starting compilation...")
         }
     }
 }
-
 
 /// Show the lines around the problematic one-
 /// ```

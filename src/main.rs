@@ -1,13 +1,10 @@
 use std::process::Command;
-
 use std::env;
 
 use std::fs::read_to_string;
 use std::fs::File;
 use std::fs;
 
-use crate::error::throw_errors;
-use crate::error::print_error;
 use crate::tokenizer::Token;
 
 extern crate colored;
@@ -38,18 +35,24 @@ fn main() {
 
     // get the file path from command line argument number 1
     let args: Vec<String> = env::args().collect();
+
+    if args.contains(&"help".to_string()) {
+        error::print_help();
+    }
+
+    // If there are no CLI arguments
     if args.len() < FILEPATH_ARG+1 {
-        print_error(
+        error::print_error(
             error::ErrorCode::MissingCommandLineArgument,
             Token { token: "".to_string(), line: 0, token_number: 0 },
-            "Missing source code file path");
-        throw_errors();
+            "Missing source code file path. Run with parameter `help` for usage info");
+        error::print_help();
     }
     let file_path = &args[FILEPATH_ARG];
 
     // See if file exists
     if !fs::metadata(&file_path).is_ok() {
-        print_error(
+        error::print_error(
             error::ErrorCode::InvalidFile,
             Token { token: "".to_string(), line: 0, token_number: 0 },
             &format!("File not found: {}", file_path),
