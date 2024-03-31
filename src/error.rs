@@ -1,6 +1,6 @@
 extern crate colored;
-
 use colored::*;
+
 use std::fs::read_to_string;
 use crate::tokenizer::Token;
 use crate::FILEPATH_ARG;
@@ -21,7 +21,6 @@ pub enum ErrorCode {
     LackingParameters,
     ForgotSemicolon,
     VariableNotDefined,
-    MissingCommandLineArgument,
     InvalidFile,
 }
 
@@ -30,13 +29,14 @@ pub enum ErrorCode {
 /// `throw_errors` will actually cause the exit but only if
 /// `print_errors` was called at least once
 ///
-pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
+pub fn print_error(error_code: ErrorCode, token: Token, extra_info: &str) {
     
     let mut is_warning: bool = false;   // If an error is only a warning, this will be set to
-                                    // true and the error count will not be incremented.
+                                        // true and the error count will not be incremented.
 
+    let mut colored_extra_info = extra_info.red();
     if extra_info == "" {
-        extra_info = "none";
+        colored_extra_info = "none".red();
     }
 
     println!();
@@ -44,37 +44,33 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
         ErrorCode::UnknownKeyword => {
             println!("Unkown token {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
             show_lines(token);
-            println!("Additional information: {}", extra_info.red());
+            println!("Additional information: {}", colored_extra_info);
         }
 
         ErrorCode::IncorrectTypeValuePassed => {
             println!("Incorrect type of value assigned to \"{}\" at line {}", token.token.italic(), (token.line+1).to_string().blue());
             show_lines(token);
-            println!("Additional information: {}", extra_info.red());
+            println!("Additional information: {}", colored_extra_info);
         }
         ErrorCode::LackingParameters => {
             println!("Incorrect amount of parameters for {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
             show_lines(token);
-            println!("Additional information: {} {}", "Fatal error, IR generation cannot proceed, further errors will not be reported.".red(), extra_info.red());
+            println!("Additional information: {} {}", "Fatal error, IR generation cannot proceed, further errors will not be reported.".red(), colored_extra_info);
         }
         ErrorCode::ForgotSemicolon => {
             println!("You might have forgotten a semicolon at line {}", (token.line+1).to_string().blue());
             show_lines(token);
-            println!("Additional information: {}", extra_info.custom_color(WARNING_COLOUR));
+            println!("Additional information: {}", colored_extra_info.custom_color(WARNING_COLOUR));
             is_warning = true;
         }
         ErrorCode::VariableNotDefined => {
             println!("Variable {} referenced before assignment at line {}", token.token.italic(), (token.line+1).to_string().blue());
             show_lines(token);
-            println!("Additional information: {}", extra_info.red());
-        }
-        ErrorCode::MissingCommandLineArgument => {
-            println!("Missing command line arguments");
-            println!("Additional information: {}", extra_info.red());
+            println!("Additional information: {}", colored_extra_info);
         }
         ErrorCode::InvalidFile => {
             println!("Invalid file.");
-            println!("Additional information: {}", extra_info.red());
+            println!("Additional information: {}", colored_extra_info);
         }
     }
     println!();
@@ -92,6 +88,7 @@ pub fn print_error(error_code: ErrorCode, token: Token, mut extra_info: &str) {
 /// This function shows a help menu with all possible
 /// arguments. Never returns as it causes an exit.
 pub fn print_help() -> ! {
+    // Show help menu
     println!("{}", "HELP".green());
     println!("{}", "---------".green());
     println!("Usage: {}", "compiler <arg1> <arg2>".italic().green());
@@ -111,7 +108,7 @@ pub fn print_help() -> ! {
 /// Before this exit, if errors occurred, they will already
 /// have been printed by `print_error()`
 ///
-pub fn throw_errors() -> () {
+pub fn throw_errors() {
     unsafe { println!("{} {}", "Warnings:".custom_color(WARNING_COLOUR), WARNING_COUNT.to_string().custom_color(WARNING_COLOUR)); }
     unsafe { println!("{} {}", "Errors occurred:".red(), ERROR_COUNT.to_string().red()); }
     println!();
@@ -125,7 +122,7 @@ pub fn throw_errors() -> () {
     }
 }
 
-/// Show the lines around the problematic one-
+/// Show the lines around the problematic one
 /// ```
 ///  9 |
 /// 10 | Something problematic here

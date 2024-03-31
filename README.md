@@ -1,26 +1,27 @@
 ```
-  ___             _ _   _     
- / _ \ _ __ _ __ (_) |_( )___ 
-| | | | '__| '_ \| | __|// __|
-| |_| | |  | | | | | |_  \__ \
- \___/|_|  |_| |_|_|\__| |___/
-  COMPILER
+ _  __     _   _     _
+| |/ /__ _| |_| |__ | | ___  ___ _ __
+| ' // _` | __| '_ \| |/ _ \/ _ \ '_ \
+| . \ (_| | |_| | | | |  __/  __/ | | |
+|_|\_\__,_|\__|_| |_|_|\___|\___|_| |_|
+ COMPILER            by Ornithopter747
 ```
 <div aria-label="Ornit's compiler"><p aria-hidden="true"></p></div> <!-- This is for screen readers -->
 
-This is a small compiler that is in the works. The goal of this project is to make a relatively simple piece of code that generates an assembly output for x64 linux netwide assembler out of a made up language.
+This is a small compiler that is in the works. It compiles a made up low-level programming language into an executable output for x64 Linux.
 
 ## Try it
 
-There are no releases yet so to try this program you must build it yourself.
+There are no releases yet so to try this program you have to build it yourself.
 - Linux x64 required
 - Install NASM and GCC
 - Clone this repository
 - Write your code in a file
 - Run with `cargo run -- <path/to/code>` or `cargo build && ./<path/to/biary> <path/to/code>`
-- Run the program you created with `./output`
+- You can also run with the `help` parameter to see the help menu.
+- Run the program you compiled with `./output`
 
-## Language
+## Kathleen Language
 
 To learn about the language's syntax or anything related to writing in it, check out [language.md](docs/language.md)
 

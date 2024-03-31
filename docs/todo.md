@@ -14,16 +14,16 @@ This is a temporary TODO that will be replaced later.
   - [ ] `print` and `println`
     - [x] Print static strings
     - [ ] Print dynamic strings
-    - [ ] Print integers
+    - [x] Print integers
     - [ ] Print strings defined inside the print itself, like `print("Hello World!")`
-    - [ ] Fix printing too many newlines issue
+    - [x] Fix printing too many newlines issue
 - [x] Write a proper README
 - [ ] Work on document/report thingy
 - [x] Make errors look nicer, with colorize crate
-- [ ] Make release / package?
 - [ ] Add `drop`
 - [ ] Add mathematical operators
+- [ ] Make release / package?
 - [ ] Add `bool`s
+- [ ] Add `if` and `else` if I'm feeling generous
 - [ ] Add `fn` and `return`
 - [ ] Add `loop` and `break`
-- [ ] Add `if` and `else` if I'm feeling generous

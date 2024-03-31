@@ -1,3 +1,9 @@
+## 30-13/03/24
+
+- Added "stdlib.asm", contains function for int -> str and the info in the .data section previously in "external.asm"
+  - Printing 64 bit unsigned integers now works
+- Fixed issue with too many newlines or weird characters after every print. print behaves as expected now.
+
 ## 23/03/24
 
 - Embedded all files into the compiled binary. The program can now access `asm/nasm-x64-linux/*` even when run outside of the project directory.

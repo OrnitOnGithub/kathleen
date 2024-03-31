@@ -40,11 +40,10 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
             }
             
             // Print an integer
-            /*
             Type::PrintInt(varname) => {
                 main.push( NAI::PrintInt(varname) );
             }
-            */
+
             Type::PrintConstStr(varname) => {
                 main.push( NAI::PrintConstStr(varname) );
             }
@@ -81,8 +80,8 @@ pub enum NAI {
     Print(String),              // Print a constant str, defined in .data
     PrintLn,                    // Print a newline.
 
-    DeclareExterns,
     EndProgram,
+    StdLib
 }
 /// This is the near assembly representation struct.
 #[derive(Debug, Clone)]

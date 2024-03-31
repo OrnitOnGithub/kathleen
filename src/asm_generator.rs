@@ -27,9 +27,6 @@ pub fn generate_asm(nar: NAR) -> String {
             NAI::CreatePointer(varname) => {
                 asm += &replace_values_in_file("create_bss_pointer.asm", vec![&varname]);
             }
-            NAI::DeclareExterns => {
-                asm += &replace_values_in_file("external.asm", vec![]);
-            }
             NAI::EndProgram => {
                 asm += &replace_values_in_file("endprogram.asm", vec![]);
             }
@@ -49,6 +46,16 @@ pub fn generate_asm(nar: NAR) -> String {
                     "println.asm",
                     vec![])
             }
+            NAI::StdLib => {
+                asm += &replace_values_in_file(
+                    "stdlib.asm",
+                    vec![])
+            }
+            NAI::PrintInt(varname) => {
+                asm += &replace_values_in_file(
+                    "print_uint64.asm",
+                    vec![varname.as_str()])
+            }
             _ => { todo!() }
         }
 
@@ -61,7 +68,6 @@ pub fn generate_asm(nar: NAR) -> String {
         asm += &generate_asm_block(x);
         asm += "\n";
     }
-    asm += &generate_asm_block(NAI::DeclareExterns);
     asm += "\n";
     asm += "\n";
 
@@ -81,6 +87,9 @@ pub fn generate_asm(nar: NAR) -> String {
         asm += "\n\n";
     }
     asm += &generate_asm_block(NAI::EndProgram);
+    
+    asm += "\n\n";
+    asm += &generate_asm_block(NAI::StdLib);
 
     return asm;
 }
