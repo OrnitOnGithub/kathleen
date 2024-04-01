@@ -1,14 +1,15 @@
-; ----------------
-; STANDARD LIBRARY
+; ------------------
+; "STANDARD LIBRARY"
+; Contains functions and data used elsewhere in the program.
+
 
 uint64_to_str:
   ; Parameters:
-  ;   rsi and rax : integer
+  ;   rax : integer
   ;   rdi         : pointer to buffer + 38
   ;
   ; Example usage:
   ;   mov     rax, 1234 ; some integer
-  ;   mov     rsi, rax
   ;   mov     rdi, uint_64_as_str_buffer + 38 ; a 39 byte buffer, 
   ;                            ; but give the pointer to the before-last byte
   ;                            ; (last is null terminator)
@@ -27,10 +28,6 @@ uint64_to_str:
   cmp     rax, 0
   jg      uint64_to_str
   mov     byte [rdi], 0
-  mov rdi, 0
-  mov rbx, 0
-  mov rax, 0
-  mov rsi, 0
   ret
 
 section .bss
