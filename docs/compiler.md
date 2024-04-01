@@ -1,18 +1,17 @@
-# Ornithopter747's compiler: documentation
+# Kathleen compiler documentation
 
-This is the documentation for the compiler itself. This document is here to explain how a program is compiled on a higher level. Lower level documentation is found [inside the code](../src/main.rs).
+This is the documentation for the compiler itself. This document is here to explain how a program is compiled. Further information is found [inside the code](../src/main.rs).
 
-This document is not very complete. Some of the examples provided may be out of date.
-
-## Table of contents:
-
-[1. Tokenization (tokenizer)](#tokenization-tokenizer)
-[2. Intermediate representation generation (ir\_generator)](#intermediate-representation-generation-ir_generator)
-[3. Near assembly representaation (nar\_generator)](#near-assembly-representaation-nar_generator)
-[4. Assembly output genertion (asm\_generator)](#assembly-output-genertion-asm_generator)
-[5. Assembling and linking](#assembling-and-linking)
-
-# Tokenization (tokenizer)
+There are 6 steps to compiling a Kathleen program. This may resemble some other compilers.
+- **Tokenization**: The first step in compiling a program is to split the keywords into tokens. This is done by the tokenizer. It also acts as a pre-processor by removing comments and joining strings together into a single token.
+- **Inetermediate representation generation**: Our tokens are then analyzed and converted into an intermediate representation (IR). This is a sort of abstract instruction tree. It is a structured organisation of instructions the program has to execute.
+- **Near assembly representation generation**: This is a second intermediate representation that is generated using the IR. It is a linear sequence of very simple "instructions". It is made to be read entirely linearly.
+- **Assembly output generation**: The near assembly representation (NAR) is then converted into assembly code. Each small instruction gets converted into a small block of assembly code.
+- **Assembling**: The assembly code has to be assembled into machine code. This is however not done by the Kathleen compiler but by NASM.
+- **Linking**: The machine code output has to be linked so it can use the C library. This is also done by an external program, GCC.
+- **Errors**: Problems may occur anytime during compilation. They have to be handled and an error module exists for that.
+ 
+# Tokenization (tokenizer.rs)
 
 Spelled with a "z" by convention.
 
@@ -100,11 +99,11 @@ pub enum Type {
 
     Int(u64),
     Bool(bool),
-    Slice(String),
+    ConstStr(String),
 
-    Print,
+    PrintInt(String),
+    PrintConstStr(String),
     PrintLn,
-    ReferenceTo(String),
 }
 ```
 
@@ -112,7 +111,7 @@ Example of an instruction that prints something
 ```
 Instruction
 |---inst_type
-|     `-Type::PrintStr
+|     `-Type::PrintConstStr
 `---parameters
       `-Instruction
         |---inst_type

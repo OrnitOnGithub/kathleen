@@ -18,12 +18,13 @@ This is a temporary TODO that will be replaced later.
     - [ ] Print strings defined inside the print itself, like `print("Hello World!")`
     - [x] Fix printing too many newlines issue
 - [x] Write a proper README
-- [ ] Work on document/report thingy
 - [x] Make errors look nicer, with colorize crate
+- [ ] Add something like token.is_string in the Token struct.
+- [ ] Clean up the IR generator. Seriously.
 - [ ] Add `drop`
 - [ ] Add mathematical operators
-- [ ] Make release / package?
+- [ ] Add `fn` and `return`
 - [ ] Add `bool`s
 - [ ] Add `if` and `else` if I'm feeling generous
-- [ ] Add `fn` and `return`
 - [ ] Add `loop` and `break`
+- [ ] Make release / package?

@@ -10,6 +10,7 @@ bool
 int
 str
 print
+println
 loop
 break
 fn
@@ -36,7 +37,7 @@ An integer
 
 ### print
 
-Displays information in the terminal
+Prints
 
 ### loop
 
