@@ -1,5 +1,5 @@
 // Small test program including all possible instructions
 let var1 int = 12;
 const var2 str = "Hello";
-print(var1); println();
+print(var1 var2); println();
 println(var2);
