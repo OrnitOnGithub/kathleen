@@ -12,18 +12,44 @@ This is a small compiler that is in the works. It compiles a made up low-level p
 
 ## Try it
 
+### Build it
+
 There are no releases yet so to try this program you have to build it yourself.
 - Linux x64 required
 - Install NASM and GCC
 - Clone this repository
-- Write your code in a file
-- Run with `cargo run -- <path/to/code>` or `cargo build && ./<path/to/biary> <path/to/code>`
-- You can also run with the `help` parameter to see the help menu.
-- Run the program you compiled with `./output`
+- Run `cargo build`
+- You'll find the executable in `target/debug/katheen`.
+
+### Run it
+
+(in these examples `target/debug/katheen` will be replaced simply with `kathleen`)
+
+To display the help menu run
+```sh
+kathleen
+```
+or
+```sh
+kathleen help
+```
+To compile a program run
+```sh
+kathleen <src> <output> [options]
+```
+For example:
+```sh
+kathleen hello.kl hello
+```
+This will create an executable you can run with `./hello` out of your program in `hello.kl`.
 
 ## Kathleen Language
 
 To learn about the language's syntax or anything related to writing in it, check out [language.md](docs/language.md)
+
+## Documentation
+
+All documentation and information can either be found in the [code itself](src/main.rs), or in the [`docs` directory](/docs/) for higher-level information. NOTE: this is not information meant for the user, it is information about the project.
 
 ## Issues
 
@@ -38,10 +64,6 @@ If you want to try and solve an issue yourself, check out [Contribute](##contrib
 ## Contribute
 
 As of now I want to work on this by myself. Once the language will have taken its basic shape I will accept contributions, and any help will be greatly appreciated.
-
-## Documentation
-
-All documentation and information can either be found in the [code itself](src/main.rs), or in the [`docs` directory](/docs/) for higher-level information.
 
 ## License & Legal
 
