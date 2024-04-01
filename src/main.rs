@@ -8,7 +8,6 @@ use std::fs;
 use std::time::Instant;
 
 // Colours in the terminal
-extern crate colored;
 use colored::*;
 
 use crate::tokenizer::Token;
@@ -36,6 +35,8 @@ const LICENSE: &'static str = include_str!("../LICENSE");
 
 // From now on in comments, "the code" refers to the
 // programming language this compiler compiles for.
+
+/// The main function handles user input and then starts the compilation.
 fn main() {
     let compilation_start_time = Instant::now();
 
@@ -43,7 +44,7 @@ fn main() {
 
     // If there are no arguments
     if args.len() < FILEPATH_ARG+1 {
-        println!("{}", "Kathleen Programming Language\n".green());
+        println!("{}", "Kathleen Programming Language Compiler\n".green());
         println!("{}", LICENSE);
         error::print_help()
     }
@@ -84,8 +85,7 @@ fn main() {
     
     }
 
-    // Tokenize (and preprocess) the code. See `tokenize` function
-    // (in tokenizer.rs) for more info
+    // Compile
     let tokens
         = tokenizer::tokenize(code_lines);
 
@@ -111,19 +111,27 @@ fn main() {
     assemble.arg("-f").arg("elf64").arg(file_path).arg("-o").arg("output.o").arg("-g");
     let asm_output = assemble.output()
         .expect("Failed to run command. Is NASM installed?");
-    println!("{}: [{}]", "Errors while assembling", String::from_utf8(asm_output.stderr.clone()).unwrap().red());
+    println!("{}: [{}]",
+        "Errors while assembling",
+        String::from_utf8(asm_output.stderr.clone()).unwrap().red()
+    );
     
     // run the command `gcc -no-pie output.o -o output -g`
     let mut link = Command::new("gcc");
     link.arg("-no-pie").arg("output.o").arg("-o").arg(output_path).arg("-g");
     let link_output = link.output()
         .expect("Failed to run command. Is GCC installed?");
-    println!("{}: [{}]", "Errors while linking", String::from_utf8(link_output.stderr.clone()).unwrap().red());
+    println!("{}: [{}]",
+        "Errors while linking",
+        String::from_utf8(link_output.stderr.clone()).unwrap().red()
+    );
 
     if asm_output.stderr.len() == 0 && link_output.stderr.len() == 0 {
         let compilation_duration = compilation_start_time.elapsed();
         println!("{} {:?}{}{}",
-        "\nCompilation successful in".green(), compilation_duration, "! Run the output binary with ./".green(),
+        "\nCompilation successful in".green(),
+        compilation_duration,
+        "! Run the output binary with ./".green(),
         output_path.green().italic()
         );
     }

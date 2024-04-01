@@ -4,28 +4,25 @@ use std::vec;
 use crate::error::{self, print_error, throw_errors, ErrorCode}; // For throwing errors.
 use crate::tokenizer::Token;
 
-/// Keep track of all variables
+// TODO: document
 #[derive(Clone)]
 struct Variable {
     name: String,
     var_type: Type,
 }
+/// Keep track of all variables
 static mut VARIABLE_LIST: Vec<Variable> = Vec::new();
 
 /// Check a variable's type. Used by IR generator and NAR generator for type-specific handling.
 fn get_var_type(token: Token) -> Type {
 
-    let mut var_found: bool = false;
     unsafe {
         for variable in VARIABLE_LIST.clone() {
             if token.token == variable.name {
-                var_found = true;
                 return variable.var_type;
             }
         }
-        if !var_found {
-            print_error(ErrorCode::VariableNotDefined, token, "")
-        }
+        print_error(ErrorCode::VariableNotDefined, token, "")
     }
     panic!("DEV: tried to check variable type of variable that does not exist.");
 }
@@ -75,8 +72,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
 
                 "let" | "const" => {
                     // This is a let binding or a constant creation. A variable is being defined.
-                    // EXAMPLE: let varname bool = true;
-                    // EXAMPLE: let varname int const = 1234;
+                    // EXAMPLE: let varname int = 1234;
                     // EXAMPLE: const varname str = "hello";
 
                     // check wether it is a constant. `is_constant` is used later throughout
@@ -151,7 +147,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                                         error::print_error(
                                             ErrorCode::IncorrectTypeValuePassed,
                                             tokens[2].clone(),
-                                            "Value passed was not an unsigned 64 bit integer."
+                                            "Value passed was not an unsigned 64 bit integer. (0-18446744073709551615)"
                                         );
 
                                         return vec![Instruction {
@@ -323,15 +319,6 @@ pub struct Instruction {
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
 
-    Function,
-
-    Loop,
-    LoopBreak,
-    
-    Condition,          // Define the evaluation
-    ConditionTrue,      // Where to go if TRUE Basically
-    ConditionFalse,     // Where to go if FALSE
-    
     Name(String),
     Int(u64),
     ConstInt(u64),

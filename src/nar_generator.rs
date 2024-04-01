@@ -71,13 +71,12 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
 #[derive(Debug, Clone)]
 pub enum NAI {
     CreatePointer(String),      // Create a pointer in the .bss section to memory. (For a qword of data)
-    AllocateInt(String, u64),   // Allocate a dword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
+    AllocateInt(String, u64),   // Allocate a qword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
     DefineConstStr(String, String, usize), // Define a constant string's name and value, also define its size (for easier printing)
-    //             name    value   size
+    //              name    value   size
 
     PrintInt(String),           // Print an integer
     PrintConstStr(String),      // Print a constant string. String = name of variable.
-    Print(String),              // Print a constant str, defined in .data
     PrintLn,                    // Print a newline.
 
     EndProgram,

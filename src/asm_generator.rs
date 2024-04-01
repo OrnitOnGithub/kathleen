@@ -25,15 +25,24 @@ pub fn generate_asm(nar: NAR) -> String {
                     vec![varname.as_str(), &int.to_string()])
             }
             NAI::CreatePointer(varname) => {
-                asm += &replace_values_in_file("create_bss_pointer.asm", vec![&varname]);
+                asm += &replace_values_in_file(
+                    "create_bss_pointer.asm",
+                    vec![&varname]);
             }
             NAI::EndProgram => {
-                asm += &replace_values_in_file("endprogram.asm", vec![]);
+                asm += &replace_values_in_file(
+                    "endprogram.asm",
+                    vec![]);
             }
             NAI::DefineConstStr(name, value, length) => {
                 asm += &replace_values_in_file(
                     "define_const_str.asm",
-                    vec![&name.to_string(), &value.to_string(), &name.to_string(), &length.to_string()]
+                    vec![
+                        &name.to_string(),
+                        &value.to_string(),
+                        &name.to_string(),
+                        &length.to_string()
+                        ]
                 )
             }
             NAI::PrintConstStr(varname) => {
@@ -56,7 +65,6 @@ pub fn generate_asm(nar: NAR) -> String {
                     "print_uint64.asm",
                     vec![varname.as_str()])
             }
-            _ => { todo!() }
         }
 
         return asm;

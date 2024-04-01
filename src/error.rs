@@ -7,8 +7,8 @@ use crate::FILEPATH_ARG;
 use std::env;
 use std::process;
 
-pub static mut ERROR_COUNT: usize = 0;
-pub static mut WARNING_COUNT: usize = 0;
+static mut ERROR_COUNT: usize = 0;
+static mut WARNING_COUNT: usize = 0;
 const WARNING_COLOUR: CustomColor = CustomColor { r: 255, g: 200, b: 50};
 
 /// used in the `throw_error()`
@@ -89,15 +89,25 @@ pub fn print_error(error_code: ErrorCode, token: Token, extra_info: &str) {
 /// arguments. Never returns as it causes an exit.
 pub fn print_help() -> ! {
     // Show help menu
+    // Maybe later put this in a formatted text file.
     println!("{}", "HELP".green());
     println!("{}", "---------".green());
-    println!("Usage: {}", "compiler <arg1> <arg2>".italic().green());
+    println!("Usage: {}", "kathleen <arg1> <arg2> <other...".italic().green());
     println!("Argument 1:");
     println!("    - {}", "path to file to compile");
-    println!("    - {}", "help".green());
+    println!("    - {} {}", "help".green(), "Shows this help menu.");
     println!("Argument 2:");
     println!("    - {}", "name of output file");
-    println!("    - {} {}", "nothing, sets output file name to", "output".green());
+    println!("    - {} {}", "if not provided, sets output file name to", "output".green());
+    println!("Other arguments:");
+    println!("    - {} {}", "noasm".green(), "  Don't assemble using NASM. (not implemented)");
+    println!("    - {} {}", "nolink".green(), " Don't link using GCC. (not implemented)");
+    println!("    - {} {}", "keepasm".green(), "Don't delete output.asm after compilation. (not implemented)");
+    println!("    - {} {}", "keepout".green(), "Don't delete output.o after compilation. (not implemented)");
+    println!("Example usage:");
+    println!("    {}", "kathleen hello.kl hello keepasm".green());
+    println!("    {}", "            |       |      |");
+    println!("    {}", "         source   output  keep the assembly output as well");
     println!();
     process::exit(1);
 }
