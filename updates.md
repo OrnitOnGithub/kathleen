@@ -1,3 +1,11 @@
+## 02/04/24
+
+- Removed sex from the compiler
+
+## 01/04/24
+
+- Added sex to the compiler
+
 ## 30-13/03/24
 
 - Added "stdlib.asm", contains function for int -> str and the info in the .data section previously in "external.asm"
