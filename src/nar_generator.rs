@@ -5,75 +5,87 @@ use crate::ir_generator::{Instruction, Type};
 /// a set of one-to-one instructions that later get turned into blocks of
 /// assembly code.
 pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
-    let mut data: Vec<NAI> = Vec::new();    // The .data section, where constants are defined.
-    let mut bss: Vec<NAI> = Vec::new();     // The .bss section, mainly used to store heap pointers
-    let mut main: Vec<NAI> = Vec::new();    // The main label, called in .text section
+    // This implementation kinda hurts my balls
+    static mut DATA: Vec<NAI> = Vec::new();    // The .data section, where constants are defined.
+    static mut BSS: Vec<NAI> = Vec::new();     // The .bss section, mainly used to store heap pointers
+    static mut MAIN: Vec<NAI> = Vec::new();    // The main label, called in .text section
 
-    for instruction in instructions {
-        match instruction.inst_type {
+    create_nais(instructions);
 
-            // Int creation
-            // It should really not be done like this!
-            // pointer (8 bytes) -> pointer (8 bytes) -> int (8 bytes)
-            // ignoring the first pointer, that's twice as much data per int!
-            Type::Int(value) => {
-                let name_struct: Type = instruction.parameters[0].inst_type.clone();
-                let varname: String = if let Type::Name(s) = name_struct {
-                    s
-                } else {
-                    panic!("DEV: Unexpected enum variant");
-                };
+    fn create_nais(instructions: Vec<Instruction>) -> () {
+        for instruction in instructions {
+            match instruction.inst_type {
 
-                bss.push( NAI::CreatePointer(varname.clone()) );
-                main.push( NAI::AllocateInt(varname.clone(), value) )
-            }
-
-            Type::ConstStr(value) => {
-                let name_struct: Type = instruction.parameters[0].inst_type.clone();
-                let varname: String = if let Type::Name(s) = name_struct {
-                    s
-                } else {
-                    panic!("DEV: Unexpected enum variant");
-                };
-
-                data.push(NAI::DefineConstStr(varname, value.clone(), value.len()))
-            }
-            
-            // Print an integer
-            Type::PrintInt(varname) => {
-                main.push( NAI::PrintInt(varname) );
-            }
-
-            Type::PrintConstStr(varname) => {
-                main.push( NAI::PrintConstStr(varname) );
-            }
-
-            // Only print a newline.
-            Type::PrintLn => {
-                main.push(NAI::PrintLn);
-            }
-
-            _ => {
-                panic!("DEV: NAR: Not an implemented instruction yet: {:?}", instruction);
+                // Int creation
+                // It should really not be done like this!
+                // pointer (8 bytes) -> pointer (8 bytes) -> int (8 bytes)
+                // ignoring the first pointer, that's twice as much data per int!
+                // This is a proof of concept to apply to dynamically sized
+                // data types later.
+                Type::Int(value) => {
+                    let name_struct: Type = instruction.parameters[0].inst_type.clone();
+                    let varname: String = if let Type::Name(s) = name_struct {
+                        s
+                    } else {
+                        panic!("DEV: Unexpected enum variant");
+                    };
+                    
+                    unsafe { BSS.push( NAI::CreatePointer(varname.clone()) ); }
+                    unsafe { MAIN.push( NAI::AllocateInt(varname.clone(), value) ); }
+                }
+                
+                Type::ConstStr(value) => {
+                    let name_struct: Type = instruction.parameters[0].inst_type.clone();
+                    let varname: String = if let Type::Name(s) = name_struct {
+                        s
+                    } else {
+                        panic!("DEV: Unexpected enum variant");
+                    };
+                    
+                    unsafe { DATA.push(NAI::DefineConstStr(varname, value.clone(), value.len())) }
+                }
+                
+                // Print an integer
+                Type::PrintInt(varname) => {
+                    unsafe { MAIN.push( NAI::PrintInt(varname) ); }
+                }
+                
+                Type::PrintConstStr(varname) => {
+                    unsafe { MAIN.push( NAI::PrintConstStr(varname) ); }
+                }
+                
+                // Only print a newline.
+                Type::PrintLn => {
+                    unsafe { MAIN.push(NAI::PrintLn); }
+                }
+                
+                _ => {
+                    panic!("DEV: NAR: Not an implemented instruction yet: {:?}", instruction);
+                }
             }
         }
     }
-    return NAR {
-        data,
-        bss,
-        main,
+
+    unsafe {
+        let data = DATA.clone();
+        let bss = BSS.clone();
+        let main = MAIN.clone();
+        return NAR {
+            data,
+            bss,
+            main,
+        }
     }
-
 }
-
-/// This is one near assembly instruction. Each of these gets
-/// turned into an assembly block of code.
-#[derive(Debug, Clone)]
-pub enum NAI {
-    CreatePointer(String),      // Create a pointer in the .bss section to memory. (For a qword of data)
-    AllocateInt(String, u64),   // Allocate a qword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
-    DefineConstStr(String, String, usize), // Define a constant string's name and value, also define its size (for easier printing)
-    //              name    value   size
+    
+    /// This is one near assembly instruction. Each of these gets
+    /// turned into an assembly block of code.
+    #[derive(Debug, Clone)]
+    pub enum NAI {
+        CreatePointer(String),      // Create a pointer in the .bss section to memory. (For a qword of data)
+        AllocateInt(String, u64),   // Allocate a qword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
+        DefineConstStr(String, String, usize), // Define a constant string's name and value, also define its size (for easier printing)
+        //              name    value   size
 
     PrintInt(String),           // Print an integer
     PrintConstStr(String),      // Print a constant string. String = name of variable.
