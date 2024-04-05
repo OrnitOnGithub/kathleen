@@ -1,3 +1,16 @@
+## 03-04/04/24
+
+- Now works as CLI tool
+  - Accepts parameters
+    - arg1: input file
+    - arg2: output file
+    - arg3: extra
+      - `noasm`: dont assemble using NASM
+      - `nolink`: dont link using GCC
+      - `keep`: keep all intermediate files
+- Updated `nar_generator.rs` to allow recursively unpacking the IR.
+- Formatted from 4 space tabs to 2 space tabs
+
 ## 02/04/24
 
 - Removed sex from the compiler
