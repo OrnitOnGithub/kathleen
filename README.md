@@ -23,7 +23,7 @@ There are no releases yet so to try this program you have to build it yourself.
 
 ### Run it
 
-(in these examples `target/debug/katheen` will be replaced simply with `kathleen`)
+(in these examples I will assume the executable in `<path/to/project>/target/debug` is in your PATH.)
 
 To display the help menu run
 ```sh
@@ -63,7 +63,7 @@ If you want to try and solve an issue yourself, check out [Contribute](##contrib
 
 ## Contribute
 
-As of now I want to work on this by myself. Once the language will have taken its basic shape I will accept contributions, and any help will be greatly appreciated.
+As of now I want to work on this by myself. Once the language will have taken its basic shape, and any help will be greatly appreciated.
 
 ## License & Legal
 
