@@ -3,7 +3,7 @@ use colored::*;
 
 use std::fs::read_to_string;
 use crate::tokenizer::Token;
-use crate::FILEPATH_ARG;
+use crate::cli::FILEPATH_ARG;
 use std::env;
 use std::process;
 
@@ -13,15 +13,16 @@ const WARNING_COLOUR: CustomColor = CustomColor { r: 255, g: 200, b: 50};
 
 /// used in the `throw_error()`
 pub enum ErrorCode {
-    /// Error code for any keyword that is not recognised
-    UnknownKeyword,
-    /// Error code for when an incorrect data type is passed, for example
-    /// `let banana int = "12";`
-    IncorrectTypeValuePassed,
-    LackingParameters,
-    ForgotSemicolon,
-    VariableNotDefined,
-    InvalidFile,
+  /// Error code for any keyword that is not recognised
+  UnknownKeyword,
+  /// Error code for when an incorrect data type is passed, for example
+  /// `let banana int = "12";`
+  IncorrectTypeValuePassed,
+  LackingParameters,
+  ForgotSemicolon,
+  VariableNotDefined,
+  InvalidFile,
+  InvalidFileWarning,
 }
 
 /// This function only prints the errors and does not cause exiting the program.
@@ -30,86 +31,63 @@ pub enum ErrorCode {
 /// `print_errors` was called at least once
 ///
 pub fn print_error(error_code: ErrorCode, token: Token, extra_info: &str) {
-    
-    let mut is_warning: bool = false;   // If an error is only a warning, this will be set to
-                                        // true and the error count will not be incremented.
+  
+  let mut is_warning: bool = false;   // If an error is only a warning, this will be set to
+                                      // true and the error count will not be incremented.
 
-    let mut colored_extra_info = extra_info.red();
-    if extra_info == "" {
-        colored_extra_info = "none".red();
+  let mut colored_extra_info = extra_info.red();
+  if extra_info == "" {
+    colored_extra_info = "none".red();
+  }
+
+  println!();
+  match error_code {
+    ErrorCode::UnknownKeyword => {
+      println!("Unkown token {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
+      show_lines(token);
+      println!("Additional information: {}", colored_extra_info);
     }
-
-    println!();
-    match error_code {
-        ErrorCode::UnknownKeyword => {
-            println!("Unkown token {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
-            show_lines(token);
-            println!("Additional information: {}", colored_extra_info);
-        }
-
-        ErrorCode::IncorrectTypeValuePassed => {
-            println!("Incorrect type of value assigned to \"{}\" at line {}", token.token.italic(), (token.line+1).to_string().blue());
-            show_lines(token);
-            println!("Additional information: {}", colored_extra_info);
-        }
-        ErrorCode::LackingParameters => {
-            println!("Incorrect amount of parameters for {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
-            show_lines(token);
-            println!("Additional information: {} {}", "Fatal error, IR generation cannot proceed, further errors will not be reported.".red(), colored_extra_info);
-        }
-        ErrorCode::ForgotSemicolon => {
-            println!("You might have forgotten a semicolon at line {}", (token.line+1).to_string().blue());
-            show_lines(token);
-            println!("Additional information: {}", colored_extra_info.custom_color(WARNING_COLOUR));
-            is_warning = true;
-        }
-        ErrorCode::VariableNotDefined => {
-            println!("Variable {} referenced before assignment at line {}", token.token.italic(), (token.line+1).to_string().blue());
-            show_lines(token);
-            println!("Additional information: {}", colored_extra_info);
-        }
-        ErrorCode::InvalidFile => {
-            println!("Invalid file.");
-            println!("Additional information: {}", colored_extra_info);
-        }
+    ErrorCode::IncorrectTypeValuePassed => {
+      println!("Incorrect type of value assigned to \"{}\" at line {}", token.token.italic(), (token.line+1).to_string().blue());
+      show_lines(token);
+      println!("Additional information: {}", colored_extra_info);
     }
-    println!();
-
-    unsafe {
-        if is_warning {
-            WARNING_COUNT += 1;
-        }
-        else {
-            ERROR_COUNT += 1;
-        }
+    ErrorCode::LackingParameters => {
+      println!("Incorrect amount of parameters for {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
+      show_lines(token);
+      println!("Additional information: {} {}", "Fatal error, IR generation cannot proceed, further errors will not be reported.".red(), colored_extra_info);
     }
-}
+    ErrorCode::ForgotSemicolon => {
+      println!("You might have forgotten a semicolon at line {}", (token.line+1).to_string().blue());
+      show_lines(token);
+      println!("Additional information: {}", colored_extra_info.custom_color(WARNING_COLOUR));
+      is_warning = true;
+    }
+    ErrorCode::VariableNotDefined => {
+      println!("Variable {} referenced before assignment at line {}", token.token.italic(), (token.line+1).to_string().blue());
+      show_lines(token);
+      println!("Additional information: {}", colored_extra_info);
+    }
+    ErrorCode::InvalidFile => {
+      println!("Invalid file.");
+      println!("Additional information: {}", colored_extra_info);
+    }
+    ErrorCode::InvalidFileWarning => {
+      println!("Potentially invalid file.");
+      println!("Additional information: {}", colored_extra_info.custom_color(WARNING_COLOUR));
+      is_warning = true;
+    }
+  }
+  println!();
 
-/// This function shows a help menu with all possible
-/// arguments. Never returns as it causes an exit.
-pub fn print_help() -> ! {
-    // Show help menu
-    // Maybe later put this in a formatted text file.
-    println!("{}", "HELP".green());
-    println!("{}", "---------".green());
-    println!("Usage: {}", "kathleen <arg1> <arg2> <other...".italic().green());
-    println!("Argument 1:");
-    println!("    - {}", "path to file to compile");
-    println!("    - {} {}", "help".green(), "Shows this help menu.");
-    println!("Argument 2:");
-    println!("    - {}", "name of output file");
-    println!("    - {} {}", "if not provided, sets output file name to", "output".green());
-    println!("Other arguments:");
-    println!("    - {} {}", "noasm".green(), "  Don't assemble using NASM. (not implemented)");
-    println!("    - {} {}", "nolink".green(), " Don't link using GCC. (not implemented)");
-    println!("    - {} {}", "keepasm".green(), "Don't delete output.asm after compilation. (not implemented)");
-    println!("    - {} {}", "keepout".green(), "Don't delete output.o after compilation. (not implemented)");
-    println!("Example usage:");
-    println!("    {}", "kathleen hello.kl hello keepasm".green());
-    println!("    {}", "            |       |      |");
-    println!("    {}", "         source   output  keep the assembly output as well");
-    println!();
-    process::exit(1);
+  unsafe {
+    if is_warning {
+      WARNING_COUNT += 1;
+    }
+    else {
+      ERROR_COUNT += 1;
+    }
+  }
 }
 
 /// This function causes an exit if errors occured.
@@ -119,17 +97,17 @@ pub fn print_help() -> ! {
 /// have been printed by `print_error()`
 ///
 pub fn throw_errors() {
-    unsafe { println!("{} {}", "Warnings:".custom_color(WARNING_COLOUR), WARNING_COUNT.to_string().custom_color(WARNING_COLOUR)); }
-    unsafe { println!("{} {}", "Errors occurred:".red(), ERROR_COUNT.to_string().red()); }
-    println!();
-    unsafe {
-        if ERROR_COUNT > 0 {
-            process::exit(1);
-        }
-        else {
-            println!("No issues found with program. Starting compilation...")
-        }
+  unsafe { println!("{} {}", "Warnings:".custom_color(WARNING_COLOUR), WARNING_COUNT.to_string().custom_color(WARNING_COLOUR)); }
+  unsafe { println!("{} {}", "Errors occurred:".red(), ERROR_COUNT.to_string().red()); }
+  println!();
+  unsafe {
+    if ERROR_COUNT > 0 {
+      process::exit(1);
     }
+    else {
+      println!("No issues found with program. Starting compilation...")
+    }
+  }
 }
 
 /// Show the lines around the problematic one
@@ -141,45 +119,45 @@ pub fn throw_errors() {
 /// With nice colours too
 fn show_lines(token: Token) -> () {
 
-    // get the file path
-    let args: Vec<String> = env::args().collect();
-    let file_path = &args[FILEPATH_ARG];
-    
-    let line: usize = token.line;
+  // get the file path
+  let args: Vec<String> = env::args().collect();
+  let file_path = &args[FILEPATH_ARG];
+  
+  let line: usize = token.line;
 
-    // Create a Vector for each line of the code.
-    let mut lines = Vec::new();
-    // Iterate through the lines, add to Vector
-    lines.push(String::from(" "));
-    for line in read_to_string(file_path).unwrap().lines() {
-        lines.push(line.to_string());
-    }
-    lines.push(String::from(" "));
-    let line = line+1;
+  // Create a Vector for each line of the code.
+  let mut lines = Vec::new();
+  // Iterate through the lines, add to Vector
+  lines.push(String::from(" "));
+  for line in read_to_string(file_path).unwrap().lines() {
+    lines.push(line.to_string());
+  }
+  lines.push(String::from(" "));
+  let line = line+1;
 
-    // Look at the digit count of each line and add a space in front accordingly
-    // example:
-    // "9", "10", "11" => " 9", "10", "11"
-    //  9 |   <=== the extra space is to align everything
-    // 10 |
-    // 11 |
-    let digit_count_first: u32 = (line-1).checked_ilog10().unwrap_or(0) + 1;
-    let digit_count_middle: u32 = (line).checked_ilog10().unwrap_or(0) + 1;
-    let digit_count_last: u32 = (line+1).checked_ilog10().unwrap_or(0) + 1;
+  // Look at the digit count of each line and add a space in front accordingly
+  // example:
+  // "9", "10", "11" => " 9", "10", "11"
+  //  9 |   <=== the extra space is to align everything
+  // 10 |
+  // 11 |
+  let digit_count_first: u32 = (line-1).checked_ilog10().unwrap_or(0) + 1;
+  let digit_count_middle: u32 = (line).checked_ilog10().unwrap_or(0) + 1;
+  let digit_count_last: u32 = (line+1).checked_ilog10().unwrap_or(0) + 1;
 
-    let mut line_number_1: String = (line-1).to_string();
-    let mut line_number_2: String = (line).to_string();
-    let line_number_3: String = (line+1).to_string();
-    
-    if digit_count_first < digit_count_middle {
-        line_number_1 = " ".to_owned() + &(line-1).to_string();
-    }
-    if digit_count_middle < digit_count_last {
-        line_number_1 = " ".to_owned() + &(line-1).to_string();
-        line_number_2 = " ".to_owned() + &(line).to_string();
-    }
+  let mut line_number_1: String = (line-1).to_string();
+  let mut line_number_2: String = (line).to_string();
+  let line_number_3: String = (line+1).to_string();
+  
+  if digit_count_first < digit_count_middle {
+    line_number_1 = " ".to_owned() + &(line-1).to_string();
+  }
+  if digit_count_middle < digit_count_last {
+    line_number_1 = " ".to_owned() + &(line-1).to_string();
+    line_number_2 = " ".to_owned() + &(line).to_string();
+  }
 
-    println!("{} {} {}", line_number_1.blue(), "|".blue(), lines[line-1]);
-    println!("{} {} {}", line_number_2.blue(), "|".blue(), lines[line]);
-    println!("{} {} {}", line_number_3.blue(), "|".blue(), lines[line+1]);
+  println!("{} {} {}", line_number_1.blue(), "|".blue(), lines[line-1]);
+  println!("{} {} {}", line_number_2.blue(), "|".blue(), lines[line]);
+  println!("{} {} {}", line_number_3.blue(), "|".blue(), lines[line+1]);
 }
