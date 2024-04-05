@@ -17,6 +17,7 @@ This is a temporary TODO that will be replaced later.
     - [x] Print integers
     - [ ] Print strings defined inside the print itself, like `print("Hello World!")`
     - [x] Fix printing too many newlines issue
+- [ ] Synthax checker that finds ALL variable names and allows better handling of "referenced before assignment" error.
 - [x] Write a proper README
 - [x] Make errors look nicer, with colorize crate
 - [ ] Add something like token.is_string in the Token struct.
