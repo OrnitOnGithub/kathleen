@@ -14,8 +14,7 @@ This document provides high-level information about the project overall. Further
 
 - [src](#src)/
 - [asm](#asm)/
-- [updates.md](#updatesmd)
-- [.github](#github)/
+- [examples](#examples)/
 
 ### src
 
@@ -50,10 +49,6 @@ syscall
 ```
 <> will get replaced by the compiler.
 
-### updates.md
+### examples
 
-A changelog.
-
-### .github
-
-Contains the github issue templates.
+Contains a list of example programs in the Kathleen language.

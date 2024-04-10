@@ -19,19 +19,13 @@ The tokenizer is a funtion inside `src/tokenizer.rs`, `pub fn tokenize(lines: Ve
 
 The tokenizer works in four steps, to finally provide a Vector of `Token` structs.
 
-## Step 1 -- Separate by whitespace
+## Step 1 -- Separate by whitespace and special characters
 
 Tokens are first separated by whitespace, anything like spaces, tabs, newlines.
 
 `let var int = 12;` => `let` `var` `int` `=` `12;`
 
-Notice how the 12 and the semicolon are stuck to eachother?
-
-## Step 2 -- Separate special characters
-
-Prior to this step, one token could totally have been `function(arg1,arg2)`, or `12;`
-
-It is now necessary to separate futher by things like brackets, commas, etc.
+Notice how the 12 and the semicolon are stuck to eachother? We also need to separate by things like brackets, commas, etc.
 
 The list of characters to separate is:
 
@@ -53,7 +47,9 @@ let special_chars: HashSet<char> = [
 ].iter().cloned().collect();
 ```
 
-## Step 3 -- Remove comments
+During this step strings are also kept kept together as a single token. If a `"` is met then everything remains unconditionally attached until the next `"`
+
+## Step 2 -- Remove comments
 
 If two consecutive "/" tokens are met, delete them and the rest of the line.
 
