@@ -1,0 +1,10 @@
+// This program prints `Hello` once. It starts a loop and breaks it.
+
+const hello str = "Hello";
+const world str = "World";
+
+loop hello_loop {
+  println(hello);
+  break hello_loop;
+  println(world);
+}

@@ -1,0 +1,10 @@
+// A program that showcases different uses of `print` and `println`
+// Run it with `kathleen 1_hello.kl && ./output`
+const hello str = "Hello";
+let number int = 12;
+
+print(hello);
+println(hello number);
+print(number hello);
+println();
+println(number);

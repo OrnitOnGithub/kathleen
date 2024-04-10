@@ -1,0 +1,13 @@
+// A "Hello World!" program.
+// Shows how you can break of an outer loop.
+
+const hello str = "Hello ";
+const world str = "World!";
+
+loop outer {
+  print(hello);
+  loop inner {
+    println(world);
+    break outer;
+  }
+}

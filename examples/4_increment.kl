@@ -1,0 +1,7 @@
+// Prints an increasingly bigger integer by incrementing it.
+
+let var int = 1;
+loop increment_loop {
+  println(var);
+  inc var;
+}
