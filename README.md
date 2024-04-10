@@ -6,7 +6,7 @@
 |_|\_\__,_|\__|_| |_|_|\___|\___|_| |_|
  COMPILER            by Ornithopter747
 ```
-<div aria-label="Ornit's compiler"><p aria-hidden="true"></p></div> <!-- This is for screen readers -->
+<div aria-label="Kathleen compiler, by Ornithopter747"><p aria-hidden="true"></p></div> <!-- This is for screen readers -->
 
 This is a small compiler that is in the works. It compiles a made up low-level programming language into an executable output for x64 Linux.
 
@@ -23,7 +23,7 @@ There are no releases yet so to try this program you have to build it yourself.
 
 ### Run it
 
-(in these examples I will assume the executable in `<path/to/project>/target/debug` is in your PATH.)
+(in these examples I will assume you added `<path/to/project>/target/debug` to your path PATH.)
 
 To display the help menu run
 ```sh
@@ -35,7 +35,7 @@ kathleen help
 ```
 To compile a program run
 ```sh
-kathleen <src> <output> [options]
+kathleen <src> <output-name> [options]
 ```
 For example:
 ```sh
@@ -45,7 +45,7 @@ This will create an executable you can run with `./hello` out of your program in
 
 ## Kathleen Language
 
-To learn about the language's syntax or anything related to writing in it, check out [language.md](docs/language.md)
+To learn about the language's syntax or anything related to writing in it, check out [language.md](docs/language.md) or [examples](examples).
 
 ## Documentation
 
@@ -59,7 +59,7 @@ If you encounter any issues using this program, create a github issue and use th
 
 If you want to propose any suggestions you are free to do so, you can use the feature request template.
 
-If you want to try and solve an issue yourself, check out [Contribute](##contribute)
+If you want to try and solve an issue yourself, check out [Contribute](#contribute)
 
 ## Contribute
 
