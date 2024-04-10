@@ -45,7 +45,13 @@ This will create an executable you can run with `./hello` out of your program in
 
 ## Kathleen Language
 
+### Learn it
+
 To learn about the language's syntax or anything related to writing in it, check out [language.md](docs/language.md) or [examples](examples).
+
+### Visual Studio Code extension
+
+You can download the syntax highlighting extension [here](https://marketplace.visualstudio.com/items?itemName=Ornithopter747.kathleen-syntax).
 
 ## Documentation
 
@@ -53,17 +59,15 @@ All documentation and information can either be found in the [code itself](src/m
 
 ## Issues
 
-If you are having trouble, or if something is unclear, you can create an issue and ask for help using the quesition / documentation issue template.
-
-If you encounter any issues using this program, create a github issue and use the bug report template.
-
+If you are having trouble, or if something is unclear, you can create an issue and ask for help using the quesition / documentation issue template. <br>
+If you encounter any issues using this program, create a github issue and use the bug report template. <br>
 If you want to propose any suggestions you are free to do so, you can use the feature request template.
 
 If you want to try and solve an issue yourself, check out [Contribute](#contribute)
 
 ## Contribute
 
-As of now I want to work on this by myself. Once the language will have taken its basic shape, and any help will be greatly appreciated.
+Once the language will have taken its basic shape, and any help will be greatly appreciated. As of now I want to work on this by myself.
 
 ## License & Legal
 
