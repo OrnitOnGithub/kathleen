@@ -15,6 +15,7 @@ This document provides high-level information about the project overall. Further
 - [src](#src)/
 - [asm](#asm)/
 - [examples](#examples)/
+- [tools](#tools)/
 
 ### src
 
@@ -52,3 +53,7 @@ syscall
 ### examples
 
 Contains a list of example programs in the Kathleen language.
+
+### Tools
+
+Contains all tools related to the language. Currently that's only the syntax highlighting extention for vscode.
