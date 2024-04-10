@@ -1,5 +1,5 @@
 // Do not run this lol
-// Repeatedly allocate an integer until a memory leak is caused.
+// Repeatedly allocate an integer until memory runs out
 
 loop piss {
   let var int = 12;
