@@ -109,8 +109,8 @@ fn print_help() -> ! {
   println!("    - {} {}", "keep".green(), "   Don't delete intermediate files (output.asm, output.o).");
   println!("Example usage:");
   println!("    {}", "kathleen hello.kl hello keep".green());
-  println!("    {}", "            |       |      |");
-  println!("    {}", "         source   output  keep the assembly output and unlinked binary as well");
+  println!("    {}", "            |       |     |");
+  println!("    {}", "         source   output  keep the assembly output and object file as well");
   println!();
   process::exit(1);
 }

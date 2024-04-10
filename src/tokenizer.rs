@@ -3,7 +3,9 @@ use std::collections::HashSet;
 /// This is the tokeniser and the pre-processor
 /// 
 /// This function does a few things:
-/// - It tokenises the code by splitting every whitespace character
+/// - It tokenises the code by splitting every whitespace character and every
+/// special character, while making sure not to split strings.
+/// (everything between two `"`)
 /// - It appends every line (Which is now a vector of tokens) to another vector.
 ///   - The index of the line in this vector is also its line number - 1.
 /// - It removes all comments
@@ -11,8 +13,8 @@ use std::collections::HashSet;
 /// 
 /// ```rust
 /// pub struct Token {
-///   pub token: String,      // the token itself, for example "let"
-///   pub line: usize,      // which line it is at
+///   pub token: String,        // the token itself, for example "let"
+///   pub line: usize,          // which line it is at
 ///   pub token_number: usize,  // which token in the line this is (0st, 1st, 2nd...)
 /// }
 /// ```
@@ -24,14 +26,14 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
   // A set of special characters to separate
   let special_chars: HashSet<char> = [// for clarity:
-    '(', ')',             // brackets
-    '{', '}',             // curly brackets
-    '[', ']',             // square brackets
-    '<', '>',             // smaller and greater signs
-    '!', '|', '&',          // exclamation mark, or operator, and operator
-    ',', '.', ':', ';',       // comma, period, colon, semicolon
-    '+', '*', '/', '-', '=', '^',   // mathematical operators: plus, multiplication, 
-                    // division, minus, equals, power
+    '(', ')',                         // brackets
+    '{', '}',                         // curly brackets
+    '[', ']',                         // square brackets
+    '<', '>',                         // smaller and greater signs
+    '!', '|', '&',                    // exclamation mark, or operator, and operator
+    ',', '.', ':', ';',               // comma, period, colon, semicolon
+    '+', '*', '/', '-', '=', '^',     // mathematical operators: plus, multiplication, 
+                                      // division, minus, equals, power
   ].iter().cloned().collect();
 
   for line in lines {
@@ -105,9 +107,9 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
     let line = &mut tokenised_lines[line_index];
 
     if line.len() > 1 { // ignore lines shorter than 2 characters
-      for i in 0..(line.len() - 1) { // -1 : no need to check last character
-        if line[i] == "/" && line[i+1] == "/" { // if two consecutive "/"s are found
-          line.truncate(i);   // cut off the rest of the line
+      for token_index in 0..(line.len() - 1) { // -1 : no need to check last character
+        if line[token_index] == "/" && line[token_index+1] == "/" { // if two consecutive "/"s are found
+          line.truncate(token_index);   // cut off the rest of the line
           break;  // exit the loop because otherwise we'd be iterating over nothing.
         }
       }
@@ -116,11 +118,8 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
 
   // Turn everything into a Token struct.
   // This struct contains the token itself as a String
-  // and other information such as what line it's in and
+  // and other information: what line it's in and
   // its position in that line.
-  // Originally indices in the Vec<Vec<String>> were used
-  // as line count and token position, but it turns out
-  // it's easier to have a continuous stream of tokens.
   let mut tokens: Vec<Token> = Vec::new();
 
   for (line_number, line) in tokenised_lines.iter().enumerate() {
@@ -133,11 +132,10 @@ pub fn tokenize(lines: Vec<String>) -> Vec<Token> {
       });
     }
   }
-
   return tokens;
-
 }
 
+/// A struct used to represent each token in the code.
 #[derive(Debug, Clone)]
 pub struct Token {
   pub token: String,        // the token itself, for example "let"

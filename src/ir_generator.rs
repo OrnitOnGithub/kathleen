@@ -1,5 +1,6 @@
 use core::panic;
 use std::vec;
+use std::iter::FromIterator;
 
 use crate::error::{self, print_error, throw_errors, ErrorCode}; // For throwing errors.
 use crate::tokenizer::Token;
@@ -22,6 +23,8 @@ fn get_var_type(token: Token) -> Type {
         return variable.var_type;
       }
     }
+    // this implementation is garbage, there should be a preliminary
+    // step where all variables are found beforehand.
     print_error(ErrorCode::VariableNotDefined, token, "")
   }
   panic!("DEV: tried to check variable type of variable that does not exist.");
@@ -40,6 +43,13 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
   }
   */
 
+  let ir: Vec<Instruction> = create_instructions(tokens);
+  
+  throw_errors(); // cause panic if there were any errors
+
+  return ir;
+
+
   // Put into a second function in case an implementation requires recursion,
   // or this could also be helpful for implementing functions, not necessarily
   // with recursion.
@@ -52,13 +62,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
       // - Keywords are handled
       // - a for loop finds a ; and deletes everything before that semicolon.
       // - and starts again, until we have reached the last semicolon.
-      let mut index_of_semicolon: usize = 0;
-      for (index, token) in tokens.clone().iter().enumerate() {
-        if token.token == String::from(";") {
-        index_of_semicolon = index;
-        break
-        }
-      }
+      let mut index_of_semicolon: usize = index_first_occurence_of(tokens.clone(), String::from(";"));
 
       if index_of_semicolon == 0 {
         if tokens.len() > 0 {
@@ -66,9 +70,62 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
         }
         break
       }
-      let token: String = tokens[0].token.clone();
+
+      let instruction_token: String = tokens[0].token.clone();
       
-      match token.as_str() {
+      match instruction_token.as_str() {
+
+        "inc" => {
+          // Increment an integer. A very simple instruction.
+
+          let variable_to_increment: String = tokens[1].token.clone();
+          
+          let instruction: Instruction = Instruction {
+            inst_type: Type::Increment(variable_to_increment),
+            parameters: vec![],
+          };
+          instructions.push(instruction);
+        }
+
+        "loop" => {
+          // EXAMPLE:
+          // loop loop_name {
+          //   do something idk
+          // }
+
+          let loop_name = tokens[1].token.clone();
+
+          // A loop, added only as proof of concept for recursive packing and unpacking
+          // of the IR.
+          let index_of_next_closed_curly_brace: usize
+            = closing_curly_brace_index(tokens.clone());
+          let tokens_inside_loop: Vec<Token>
+            = Vec::from_iter(tokens[3..index_of_next_closed_curly_brace].iter().cloned());
+          let instruction: Instruction = Instruction {
+            inst_type: Type::Loop(loop_name),
+            parameters: create_instructions(tokens_inside_loop),
+          };
+          instructions.push(instruction);
+
+          // delete all tokens before curly brace
+          for _ in 0..index_of_next_closed_curly_brace {
+            tokens.remove(0);
+          }
+          index_of_semicolon = 0; // Act as if the closing bracket was the semicolon (end of instruction)
+        }
+
+        "break" => {
+          // EXAMPLE: break loop_name
+
+          let loop_name = tokens[1].token.clone();
+
+          let instruction: Instruction = Instruction {
+            inst_type: Type::LoopExit(loop_name),
+            parameters: vec![]
+          };
+
+          instructions.push(instruction);
+        }
 
         "let" | "const" => {
           // This is a let binding or a constant creation. A variable is being defined.
@@ -78,33 +135,29 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           // check wether it is a constant. `is_constant` is used later throughout
           // the code, for example to know whether to define a `Str` or `ConstStr`.
           let mut is_constant = false;
-          if token == "const" {
+          if instruction_token == "const" {
             is_constant = true;
           }
 
           // If the expression is less than 6 tokens long including the semicolon,
           // then it must be incorrect.
           // let varname int = 12 ;
-          //  1   2   3  4  5 6
-          //  0   1   2  3  4 5  <- if we start at 0, so for indices.
+          //  0     1     2  3  4 5
           if index_of_semicolon < 5 {
-            print_error(ErrorCode::LackingParameters, tokens[0].clone(), "Let bindings work like this: let variable_name data_type = value;");
+            print_error(
+              ErrorCode::LackingParameters,
+              tokens[0].clone(),
+              "Let bindings work like this: let variable_name data_type = value;"
+            );
             break;
           }
-
 
           // tokens[1] (the second token) is the variable name.
           // We store it for later use.
           let varname: String = tokens[1].token.clone();
 
           // find where the (first) `=` is located, because we know everyhing after that is (a) value(s)
-          let mut index_of_equal: usize = 0;
-          for (index, token) in tokens.clone().iter().enumerate() {
-            if token.token == String::from("=") {
-              index_of_equal = index;
-              break
-            }
-          }
+          let index_of_equal: usize = index_first_occurence_of(tokens.clone(), String::from("="));
 
           // match for the third token, which is the data type.  
           match tokens[2].token.as_str() {
@@ -115,7 +168,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
             /*
             Instruction
             |---inst_type
-            |   `-Type::Int
+            |   `-Type::Int(123)
             `---parameters
                 `-Instruction
                 |---inst_type
@@ -139,7 +192,8 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
               }
               
               // Return an instruction struct that defines either a ConstInt or an Int.
-              //
+              // I don't remember how this works because I didn't document it whenever I made it,
+              // like 3 months ago as of this comment.
               let instruction: Instruction = Instruction {
                 inst_type: match tokens[index_of_equal + 1].token.clone().as_str().parse::<u64>() {
                   Ok(value) => int_type(value, is_constant), // int_type returns Type::ConstInt if constant, Type::Int otherwise.
@@ -199,46 +253,39 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
         }
         
         "print" | "println" => {
+          // EXAMPLE: println(var var2)
+          // EXAMPLE: print(var var2);
+          // EXAMPLE: println(var);
+          // EXAMPLE: print(var);
 
           //let varname: String = tokens[1].token.clone(); // WHAT???
 
           let mut print_line: bool = false;
-          if token == "println" {
+          if instruction_token == "println" {
             print_line = true;
           }
 
-          // I'll clean this up later
-          let mut index_of_open_bracket: usize = 0;
-          for (index, token) in tokens.clone().iter().enumerate() {
-            if token.token == String::from("(") {
-              index_of_open_bracket = index;
-              break
-            }
-          }
-          let mut index_of_closed_bracket: usize = 0;
-          for (index, token) in tokens.clone().iter().enumerate() {
-            if token.token == String::from(")") {
-              index_of_closed_bracket = index;
-              break
-            }
-          }
+          let index_of_open_bracket: usize = index_first_occurence_of(tokens.clone(), String::from("("));
+          let index_of_closed_bracket: usize = index_first_occurence_of(tokens.clone(), String::from(")"));
 
           for varname_index in index_of_open_bracket+1..index_of_closed_bracket {
 
             let varname = tokens[varname_index].token.clone();
-            
             let var_type = get_var_type(tokens[varname_index].clone());
 
             match var_type.clone() {
 
-              Type::Int(int) | Type::ConstInt(int) => {
+              // PROBLEM
+              // This is reduntant for no reason wtf??
+              // Type::Print(String) contains the name,
+              // no need to put it in parameters. FIX THIS later.
 
+              Type::Int(int) | Type::ConstInt(int) => {
                 // If the variable is constant, do PrintConstInt, otherwise do PrintInt
                 let mut print_int_type: Type = Type::PrintInt(varname.clone());
                 if var_type == Type::ConstInt(int) {
                   print_int_type = Type::PrintConstInt(varname.clone());
                 }
-
                 let instruction: Instruction = Instruction {
                   inst_type: print_int_type, // Either PrintConstInt or PrintInt
                   parameters: vec![
@@ -252,13 +299,11 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
               }
 
               Type::Str(str) | Type::ConstStr(str) => {
-
                 // If the variable is constant, do PrintConstStr, otherwise do PrintStr
                 let mut print_str_type: Type = Type::PrintStr(varname.clone());
                 if var_type == Type::ConstStr(str) {
                   print_str_type = Type::PrintConstStr(varname.clone());
                 }
-
                 let instruction: Instruction = Instruction {
                   inst_type: print_str_type, // Either PrintConstStr or PrintStr
                   parameters: vec![]
@@ -271,6 +316,10 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
               }
             }
           }
+
+          // If the instruction is "println", then add the PrintLn
+          // Instruction to the list of instructions. This instruction
+          // only prints a newline.
           if print_line {
             let instruction: Instruction = Instruction {
               inst_type: Type::PrintLn,
@@ -282,7 +331,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
 
         _ => {
           print_error(ErrorCode::UnknownKeyword, tokens[0].clone(), "This token is not a supported instruction.")
-        }   
+        }
       }
       
       // end of loop here
@@ -293,17 +342,60 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
     }
     return instructions
   }
-  
-  let ir: Vec<Instruction> = create_instructions(tokens);
-  
-  throw_errors(); // cause panic if there were any errors
-
-  return ir;
-
 }
+
+/// Get the index of the curly brace that closes the block the start of `tokens` is in.
+/// For example, if we had the following in `Vec<Token>` form:
+/// ```
+/// {     // 0
+///   {   // 1
+/// 
+///   }   // 2
+/// }     // 3
+/// }     // 4
+/// ```
+/// It would return `3`, because that corresponds to the curly brace that closes the first
+/// open one.
+fn closing_curly_brace_index(tokens: Vec<Token>) -> usize {
+  let mut open_brace_counter: usize = 0;
+
+  for (index_of_token, token) in tokens.iter().enumerate() {
+    if token.token.as_str() == "{" {
+      open_brace_counter += 1;
+    }
+    if token.token.as_str() == "}" {
+      open_brace_counter -= 1;
+      if open_brace_counter == 0 {
+        return index_of_token
+      }
+    }
+  }
+  // If we reach here, curly brace was not found.
+
+  let index_of_first_curly_brace = index_first_occurence_of(tokens.clone(), String::from("{"));
+
+  print_error(
+    ErrorCode::CannotFindCounterpart,
+    tokens[index_of_first_curly_brace].clone(),
+    "This curly brace has no closing curly brace to go with it. You are missing a closed curly brace `}` somewhere.");
+  throw_errors();
+  return 0;
+}
+
+fn index_first_occurence_of(tokens: Vec<Token>, query: String) -> usize {
+  let mut index_of_occurence: usize = 0;
+  for (index, token) in tokens.clone().iter().enumerate() {
+    if token.token == query {
+      index_of_occurence = index;
+      break
+    }
+  }
+  return index_of_occurence
+}
+
 /// Represents an instruction or a set of instructions
 /// in the intermediate representation.
-/// `inst_type` defines the type of instruction, while `parameters`
+/// `inst_type` defines the type of instruction, `parameters`
 /// contains a vector of additional instructions or arguments
 /// associated with this instruction.
 #[derive(Debug, Clone)]
@@ -318,6 +410,10 @@ pub struct Instruction {
 /// constants, and various data types.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
+  Increment(String), // string = int to increment name
+
+  Loop(String),     // string = loop name
+  LoopExit(String), // break from loop
 
   Name(String),
   Int(u64),

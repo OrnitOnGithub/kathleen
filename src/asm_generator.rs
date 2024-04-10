@@ -23,20 +23,23 @@ pub fn generate_asm(nar: NAR) -> String {
     let mut asm: String = String::new();
 
     match nai {
-      NAI::AllocateInt(varname, int) => {
+      NAI::AllocateInt(variable_name, int) => {
         asm += &replace_values_in_file(
           "allocate_int.asm",
-          vec![varname.as_str(), &int.to_string()])
+          vec![variable_name.as_str(), &int.to_string()]
+        )
       }
-      NAI::CreatePointer(varname) => {
+      NAI::CreatePointer(variable_name) => {
         asm += &replace_values_in_file(
           "create_bss_pointer.asm",
-          vec![&varname]);
+          vec![&variable_name]
+        )
       }
       NAI::EndProgram => {
         asm += &replace_values_in_file(
           "endprogram.asm",
-          vec![]);
+          vec![]
+        )
       }
       NAI::DefineConstStr(name, value, length) => {
         asm += &replace_values_in_file(
@@ -46,28 +49,62 @@ pub fn generate_asm(nar: NAR) -> String {
             &value.to_string(),
             &name.to_string(),
             &length.to_string()
-            ]
+          ]
         )
       }
-      NAI::PrintConstStr(varname) => {
+      NAI::PrintConstStr(variable_name) => {
         asm += &replace_values_in_file(
           "print_constant_string.asm",
-          vec![&varname, varname.as_str()])
+          vec![&variable_name, variable_name.as_str()]
+        )
       }
       NAI::PrintLn => {
         asm += &replace_values_in_file(
           "println.asm",
-          vec![])
+          vec![]
+        )
       }
       NAI::StdLib => {
         asm += &replace_values_in_file(
           "stdlib.asm",
-          vec![])
+          vec![]
+        )
       }
-      NAI::PrintInt(varname) => {
+      NAI::PrintInt(variable_name) => {
         asm += &replace_values_in_file(
           "print_uint64.asm",
-          vec![varname.as_str()])
+          vec![variable_name.as_str()]
+        )
+      }
+      NAI::LoopCall(loop_name) => {
+        asm += &replace_values_in_file(
+          "loop_call.asm",
+          vec![loop_name.clone().as_str(), loop_name.clone().as_str()]
+        )
+      }
+      NAI::LoopDefine(loop_name) => {
+        asm += &replace_values_in_file(
+          "loop_define.asm",
+          vec![loop_name.clone().as_str()]
+        )
+      }
+      NAI::LoopExit(loop_name) => {
+        asm += &replace_values_in_file(
+          "loop_exit.asm",
+          vec![loop_name.clone().as_str()]
+        )
+      }
+      NAI::LoopRepeat(loop_name) => {
+        asm += &replace_values_in_file(
+          "loop_repeat.asm",
+          vec![loop_name.as_str()]
+        )
+      }
+      NAI::Increment(variable_name) => {
+        asm += &replace_values_in_file(
+          "increment_int.asm",
+          vec![variable_name.as_str()]
+        )
       }
     }
 
@@ -99,6 +136,11 @@ pub fn generate_asm(nar: NAR) -> String {
     asm += "\n\n";
   }
   asm += &generate_asm_block(NAI::EndProgram);
+
+  for x in nar.other {
+    asm += &generate_asm_block(x);
+    asm += "\n\n";
+  }
   
   asm += "\n\n";
   asm += &generate_asm_block(NAI::StdLib);

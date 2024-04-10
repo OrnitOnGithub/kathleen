@@ -23,6 +23,7 @@ pub enum ErrorCode {
   VariableNotDefined,
   InvalidFile,
   InvalidFileWarning,
+  CannotFindCounterpart,
 }
 
 /// This function only prints the errors and does not cause exiting the program.
@@ -76,6 +77,11 @@ pub fn print_error(error_code: ErrorCode, token: Token, extra_info: &str) {
       println!("Potentially invalid file.");
       println!("Additional information: {}", colored_extra_info.custom_color(WARNING_COLOUR));
       is_warning = true;
+    }
+    ErrorCode::CannotFindCounterpart => {
+      println!("Token {} on line {} has no matching counterpart.", token.token.italic(), (token.line+1).to_string().blue());
+      show_lines(token);
+      println!("Additional information: {}", colored_extra_info);
     }
   }
   println!();
