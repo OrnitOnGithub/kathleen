@@ -1,0 +1,29 @@
+{
+  "name": "kathleen-syntax",
+  "displayName": "Kathleen Syntax Highlighting",
+  "description": "A syntax highlighting extension for the programming language Kathleen.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "kl",
+      "aliases": ["Kathleen", "kl"],
+      "extensions": [".kl"],
+      "configuration": "./language-configuration.json",
+      "icon": {
+        "light": "./icons/kathleen-logo.png",
+        "dark": "./icons/kathleen-logo.png"
+      }
+    }],
+    "grammars": [{
+      "language": "kl",
+      "scopeName": "source.kl",
+      "path": "./syntaxes/kl.tmLanguage.json"
+    }]
+  }
+}
