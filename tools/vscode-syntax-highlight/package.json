@@ -1,8 +1,10 @@
 {
   "name": "kathleen-syntax",
   "displayName": "Kathleen Syntax Highlighting",
-  "description": "A syntax highlighting extension for the programming language Kathleen.",
-  "version": "0.0.1",
+  "description": "A syntax highlighting extension for the Kathleen programming language.",
+  "publisher": "Ornithopter747",
+  "icon": "icons/kathleen-logo.png",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.88.0"
   },

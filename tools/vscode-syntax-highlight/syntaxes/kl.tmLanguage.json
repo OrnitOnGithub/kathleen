@@ -25,8 +25,16 @@
 			"patterns": [
 				{
 					"name": "keyword.control.kl",
-					"match": "\\b(break|loop|=|let|const|int|str|print|println|inc)\\b"
-				}
+					"match": "\\b(break|loop|let|const|inc)\\b"
+				},
+				{
+          "name": "keyword.datatype.kl",
+          "match": "\\b(int|str)\\b"
+        },
+        {
+          "name": "keyword.function.kl",
+          "match": "\\b(print|println)\\b"
+        }
 			]
 		},
 		"strings": {
