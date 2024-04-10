@@ -1,3 +1,9 @@
+## 09-10/04/24
+
+- Implemented loops
+  - Loops are named because that was the easiest way to implement this
+- Implemented incrementing integers
+
 ## 03-04/04/24
 
 - Now works as CLI tool
