@@ -1,3 +1,7 @@
+## 11/04/24
+
+- Created a vscode extension and put it on the marketplace! It's called Kathleen Syntax Highlighting.
+
 ## 09-10/04/24
 
 - Implemented loops
