@@ -1,3 +1,16 @@
+# Comments
+
+## Line comment
+
+```
+//a valid comment
+// a valid comment
+/ / a valid comment
+<code> // a valid comment
+```
+
+Two forward slashes following eachother, no matter how far apart will turn the rest of the line into a comment.
+
 # Variable assignments
 
 ## Let binding
