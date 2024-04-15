@@ -15,7 +15,7 @@ struct Variable {
 static mut VARIABLE_LIST: Vec<Variable> = Vec::new();
 
 /// Check a variable's type. Used by IR generator and NAR generator for type-specific handling.
-fn get_var_type(token: Token) -> Type {
+fn var_type(token: Token) -> Type {
 
   unsafe {
     for variable in VARIABLE_LIST.clone() {
@@ -75,6 +75,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
       
       match instruction_token.as_str() {
 
+        // MARK: Increment
         "inc" => {
           // Increment an integer. A very simple instruction.
 
@@ -87,10 +88,11 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           instructions.push(instruction);
         }
 
+        // MARK: Loop
         "loop" => {
           // EXAMPLE:
           // loop loop_name {
-          //   do something idk
+          //   do something idk;
           // }
 
           let loop_name = tokens[1].token.clone();
@@ -114,8 +116,9 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           index_of_semicolon = 0; // Act as if the closing bracket was the semicolon (end of instruction)
         }
 
+        // MARK: Break
         "break" => {
-          // EXAMPLE: break loop_name
+          // EXAMPLE: break loop_name;
 
           let loop_name = tokens[1].token.clone();
 
@@ -127,6 +130,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           instructions.push(instruction);
         }
 
+        // MARK: Let | Const
         "let" | "const" => {
           // This is a let binding or a constant creation. A variable is being defined.
           // EXAMPLE: let varname int = 1234;
@@ -203,7 +207,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                       tokens[2].clone(),
                       "Value passed was not an unsigned 64 bit integer. (0-18446744073709551615)"
                     );
-
+                    // Return something random because we caused an error anyways
                     return vec![Instruction {
                       inst_type: Type::Int(0),
                       parameters: Vec::new(),
@@ -252,6 +256,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           };
         }
         
+        // MARK: Print | PrintLn
         "print" | "println" => {
           // EXAMPLE: println(var var2)
           // EXAMPLE: print(var var2);
@@ -271,7 +276,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           for varname_index in index_of_open_bracket+1..index_of_closed_bracket {
 
             let varname = tokens[varname_index].token.clone();
-            let var_type = get_var_type(tokens[varname_index].clone());
+            let var_type = var_type(tokens[varname_index].clone());
 
             match var_type.clone() {
 
@@ -329,6 +334,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           }
         }
 
+        // MARK: _ =>
         _ => {
           print_error(ErrorCode::UnknownKeyword, tokens[0].clone(), "This token is not a supported instruction.")
         }
@@ -393,6 +399,8 @@ fn index_first_occurence_of(tokens: Vec<Token>, query: String) -> usize {
   return index_of_occurence
 }
 
+// TODO: RETHINK & REORGANISE this mess of an IR
+
 /// Represents an instruction or a set of instructions
 /// in the intermediate representation.
 /// `inst_type` defines the type of instruction, `parameters`
@@ -410,20 +418,45 @@ pub struct Instruction {
 /// constants, and various data types.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
-  Increment(String), // string = int to increment name
-
-  Loop(String),     // string = loop name
-  LoopExit(String), // break from loop
-
+  /// Increments an integer.
+  /// - String: name of the integer to increment
+  /// - Needs no additional parameters (in `Instruction` struct)
+  Increment(String),
+  /// Creates a loop
+  /// - String: name of the loop
+  /// - Parameters: Instructions to loop over
+  Loop(String),
+  /// Exits from the named loop - "break"
+  /// - String: name of loop
+  LoopExit(String),
+  /// A kind of useless enum variant that needs to be removed
   Name(String),
+  /// Define a 64 bit integer
+  /// - u64: value
+  /// - Uses Name enum variant to define its name in an Instruction in parameters.
+  ///   Should probably be changed.
   Int(u64),
+  /// Define a constant integer
+  /// - not implemented
   ConstInt(u64),
+  /// Define a dynamic string
+  /// - not implemented
   Str(String),
+  /// Define a constant string
+  /// - String: Value
+  /// - Name in parameters: name
   ConstStr(String),
-
+  // TODO: maybe print should be a single enum variant for all types and nar_generator deals with the bull.sh
+  /// Print an integer
+  /// - String: name
   PrintInt(String),
+  /// Print a constant integer - not implemented
   PrintConstInt(String),
+  /// Print a dynamic string - not implemented
   PrintStr(String),
-  PrintConstStr(String), // String = name of the variable to print
+  /// Print a constant string
+  /// - String: name of var to print
+  PrintConstStr(String),
+  /// Print a newline
   PrintLn,
 }

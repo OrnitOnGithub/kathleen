@@ -4,6 +4,9 @@ use crate::ir_generator::{Instruction, Type};
 /// This function turns the IR into a near assembly representation. This is 
 /// a set of one-to-one instructions that later get turned into blocks of
 /// assembly code.
+/// 
+/// Takes as parameter a vector of `Instruction`s and turns it into a `NAR` struct,
+/// which contains all necessary information for easy 1-to-1 conversion into assembly.
 pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
 
   // This implementation kinda hurts my balls
@@ -124,26 +127,60 @@ pub fn generate_nar(instructions: Vec<Instruction>) -> NAR {
 /// turned into an assembly block of code.
 #[derive(Debug, Clone)]
 pub enum NAI {
-  CreatePointer(String),                 // Create a pointer in the .bss section to memory. (For a qword of data)
-  AllocateInt(String, u64),              // Allocate a qword, put the int in it and put the pointer in the BSS pointer's pointed memory region.
-  DefineConstStr(String, String, usize), // Define a constant string's name and value, also define its size (for easier printing)
-  //               name  value   size
+  /// Create a pointer in the .bss section to memory.
+  /// (qword size pointer (normal pointer))
+  /// - String = name
+  CreatePointer(String),
+  /// Allocate a qword, put the int in it and put the pointer
+  /// in the BSS pointer's pointed memory region.
+  /// This is a proof of concept for dynamic memory and should not be done like this.
+  /// - String: name
+  /// - u64: value
+  AllocateInt(String, u64),
+  /// Define a constant string's name and value, also define its size (for easier printing)
+  /// - String: name
+  /// - String: value
+  /// - usize: size
+  DefineConstStr(String, String, usize),
 
+  /// Increment an integer
+  /// - String: name of integer to increment
   Increment(String),
 
-  PrintInt(String),       // Print an integer
-  PrintConstStr(String),  // Print a constant string. String = name of variable.
-  PrintLn,                // Print a newline.
+  /// Print an integer
+  /// - String: name of integer
+  PrintInt(String),
+  /// Print a constant string.
+  /// - String: name of variable.
+  PrintConstStr(String),  
+  /// Just print a newline
+  PrintLn,
 
-  LoopCall(String),       
-  LoopDefine(String),
+  /// Call the named loop label, and also define the exit label right under the call
+  /// - String: loop name
+  LoopCall(String),
+  /// Define the label for the loop
+  /// - String: loop name
+  LoopDefine(String),        // MARK: Break
+
+  /// Exit the named loop by jumping to its exit label.
+  /// - String: loop name
   LoopExit(String),
+  /// Call the loop label
+  /// - String: loop name
   LoopRepeat(String),
 
+  /// Do the program exit syscall
   EndProgram,
+  /// Define all the utility functions
   StdLib,
 }
 /// This is the near assembly representation struct.
+/// It contains the 3 main sections
+/// - section .data
+/// - section .bss
+/// - section .text <br>  global main <br> main:
+/// As well as an extra buffer to add other functions and such.
 #[derive(Debug, Clone)]
 pub struct NAR {
   pub data: Vec<NAI>,
