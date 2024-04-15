@@ -151,19 +151,19 @@ fn show_lines(token: Token) -> () {
   let digit_count_middle: u32 = (line).checked_ilog10().unwrap_or(0) + 1;
   let digit_count_last: u32 = (line+1).checked_ilog10().unwrap_or(0) + 1;
 
-  let mut line_number_1: String = (line-1).to_string();
-  let mut line_number_2: String = (line).to_string();
-  let line_number_3: String = (line+1).to_string();
+  let mut line_1: String = (line-1).to_string();
+  let mut line_2: String = (line).to_string();
+  let line_3: String = (line+1).to_string();
   
   if digit_count_first < digit_count_middle {
-    line_number_1 = " ".to_owned() + &(line-1).to_string();
+    line_1 = " ".to_owned() + &(line-1).to_string();
   }
   if digit_count_middle < digit_count_last {
-    line_number_1 = " ".to_owned() + &(line-1).to_string();
-    line_number_2 = " ".to_owned() + &(line).to_string();
+    line_1 = " ".to_owned() + &(line-1).to_string();
+    line_2 = " ".to_owned() + &(line).to_string();
   }
 
-  println!("{} {} {}", line_number_1.blue(), "|".blue(), lines[line-1]);
-  println!("{} {} {}", line_number_2.blue(), "|".blue(), lines[line]);
-  println!("{} {} {}", line_number_3.blue(), "|".blue(), lines[line+1]);
+  println!("{} {} {}", line_1.blue(), "|".blue(), lines[line-1]);
+  println!("{} {} {}", line_2.blue(), "|".blue(), lines[line]);
+  println!("{} {} {}", line_3.blue(), "|".blue(), lines[line+1]);
 }
