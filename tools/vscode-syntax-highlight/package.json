@@ -6,7 +6,7 @@
   "icon": "icons/kathleen-logo.png",
   "version": "0.0.4",
   "engines": {
-    "vscode": "^1.88.0"
+    "vscode": "^1.87.0"
   },
   "categories": [
     "Programming Languages"
