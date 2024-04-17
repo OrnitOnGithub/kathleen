@@ -53,25 +53,25 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
   // Put into a second function in case an implementation requires recursion,
   // or this could also be helpful for implementing functions, not necessarily
   // with recursion.
-  fn create_instructions(mut tokens: Vec<Token>) -> Vec<Instruction> {
+  fn create_instructions(mut tokens_to_process: Vec<Token>) -> Vec<Instruction> {
 
-    let mut instructions: Vec<Instruction> = Vec::new();
+    let mut instructions_to_return: Vec<Instruction> = Vec::new();
 
     loop {
       // a loop where:
       // - Keywords are handled
       // - a for loop finds a ; and deletes everything before that semicolon.
       // - and starts again, until we have reached the last semicolon.
-      let mut index_of_semicolon: usize = index_first_occurence_of(tokens.clone(), String::from(";"));
+      let mut index_of_semicolon: usize = index_first_occurence_of(tokens_to_process.clone(), String::from(";"));
 
       if index_of_semicolon == 0 {
-        if tokens.len() > 0 {
-          print_error(ErrorCode::ForgotSemicolon, tokens[0].clone(), "");
+        if tokens_to_process.len() > 0 {
+          print_error(ErrorCode::ForgotSemicolon, tokens_to_process[0].clone(), "");
         }
         break
       }
 
-      let instruction_token: String = tokens[0].token.clone();
+      let instruction_token: String = tokens_to_process[0].token.clone();
       
       match instruction_token.as_str() {
 
@@ -79,13 +79,13 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
         "inc" => {
           // Increment an integer. A very simple instruction.
 
-          let variable_to_increment: String = tokens[1].token.clone();
+          let variable_to_increment: String = tokens_to_process[1].token.clone();
           
           let instruction: Instruction = Instruction {
             inst_type: Type::Increment(variable_to_increment),
             parameters: vec![],
           };
-          instructions.push(instruction);
+          instructions_to_return.push(instruction);
         }
 
         // MARK: Loop
@@ -95,23 +95,23 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           //   do something idk;
           // }
 
-          let loop_name = tokens[1].token.clone();
+          let loop_name = tokens_to_process[1].token.clone();
 
           // A loop, added only as proof of concept for recursive packing and unpacking
           // of the IR.
           let index_of_next_closed_curly_brace: usize
-            = closing_curly_brace_index(tokens.clone());
+            = closing_curly_brace_index(tokens_to_process.clone());
           let tokens_inside_loop: Vec<Token>
-            = Vec::from_iter(tokens[3..index_of_next_closed_curly_brace].iter().cloned());
+            = Vec::from_iter(tokens_to_process[3..index_of_next_closed_curly_brace].iter().cloned());
           let instruction: Instruction = Instruction {
             inst_type: Type::Loop(loop_name),
             parameters: create_instructions(tokens_inside_loop),
           };
-          instructions.push(instruction);
+          instructions_to_return.push(instruction);
 
           // delete all tokens before curly brace
           for _ in 0..index_of_next_closed_curly_brace {
-            tokens.remove(0);
+            tokens_to_process.remove(0);
           }
           index_of_semicolon = 0; // Act as if the closing bracket was the semicolon (end of instruction)
         }
@@ -120,14 +120,14 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
         "break" => {
           // EXAMPLE: break loop_name;
 
-          let loop_name = tokens[1].token.clone();
+          let loop_name = tokens_to_process[1].token.clone();
 
           let instruction: Instruction = Instruction {
             inst_type: Type::LoopExit(loop_name),
             parameters: vec![]
           };
 
-          instructions.push(instruction);
+          instructions_to_return.push(instruction);
         }
 
         // MARK: Let | Const
@@ -150,7 +150,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
           if index_of_semicolon < 5 {
             print_error(
               ErrorCode::LackingParameters,
-              tokens[0].clone(),
+              tokens_to_process[0].clone(),
               "Let bindings work like this: let variable_name data_type = value;"
             );
             break;
@@ -158,13 +158,13 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
 
           // tokens[1] (the second token) is the variable name.
           // We store it for later use.
-          let varname: String = tokens[1].token.clone();
+          let varname: String = tokens_to_process[1].token.clone();
 
           // find where the (first) `=` is located, because we know everyhing after that is (a) value(s)
-          let index_of_equal: usize = index_first_occurence_of(tokens.clone(), String::from("="));
+          let index_of_equal: usize = index_first_occurence_of(tokens_to_process.clone(), String::from("="));
 
           // match for the third token, which is the data type.  
-          match tokens[2].token.as_str() {
+          match tokens_to_process[2].token.as_str() {
 
             // We are creating an unsigned 64 bit integer.
             // TODO: support for operations after the equal.
@@ -199,12 +199,12 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
               // I don't remember how this works because I didn't document it whenever I made it,
               // like 3 months ago as of this comment.
               let instruction: Instruction = Instruction {
-                inst_type: match tokens[index_of_equal + 1].token.clone().as_str().parse::<u64>() {
+                inst_type: match tokens_to_process[index_of_equal + 1].token.clone().as_str().parse::<u64>() {
                   Ok(value) => int_type(value, is_constant), // int_type returns Type::ConstInt if constant, Type::Int otherwise.
                   Err(_) => {
                     error::print_error(
                       ErrorCode::IncorrectTypeValuePassed,
-                      tokens[2].clone(),
+                      tokens_to_process[2].clone(),
                       "Value passed was not an unsigned 64 bit integer. (0-18446744073709551615)"
                     );
                     // Return something random because we caused an error anyways
@@ -220,7 +220,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                 }],
               };
 
-              instructions.push(instruction);
+              instructions_to_return.push(instruction);
               unsafe { VARIABLE_LIST.push(Variable { name: varname.clone(), var_type: int_type(0, is_constant) }) }
             }
 
@@ -235,7 +235,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
               }
 
               let instruction: Instruction = Instruction {
-                inst_type: str_type(tokens[index_of_equal+1].token.clone(), is_constant),
+                inst_type: str_type(tokens_to_process[index_of_equal+1].token.clone(), is_constant),
                 parameters: vec![
                   Instruction {
                     inst_type: Type::Name(varname.clone()),
@@ -244,13 +244,13 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                 ]
               };
 
-              instructions.push(instruction);
+              instructions_to_return.push(instruction);
               unsafe { VARIABLE_LIST.push(Variable { name: varname, var_type: str_type(String::new(), is_constant) })}
 
             }
               
             _ => {
-              print_error(ErrorCode::UnknownKeyword, tokens[2].clone(), "Unknown \
+              print_error(ErrorCode::UnknownKeyword, tokens_to_process[2].clone(), "Unknown \
               data type. The third token of a let binding is a data type.");
             }
           };
@@ -270,13 +270,13 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
             print_line = true;
           }
 
-          let index_of_open_bracket: usize = index_first_occurence_of(tokens.clone(), String::from("("));
-          let index_of_closed_bracket: usize = index_first_occurence_of(tokens.clone(), String::from(")"));
+          let index_of_open_bracket: usize = index_first_occurence_of(tokens_to_process.clone(), String::from("("));
+          let index_of_closed_bracket: usize = index_first_occurence_of(tokens_to_process.clone(), String::from(")"));
 
           for varname_index in index_of_open_bracket+1..index_of_closed_bracket {
 
-            let varname = tokens[varname_index].token.clone();
-            let var_type = var_type(tokens[varname_index].clone());
+            let varname = tokens_to_process[varname_index].token.clone();
+            let var_type = var_type(tokens_to_process[varname_index].clone());
 
             match var_type.clone() {
 
@@ -295,12 +295,12 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                   inst_type: print_int_type, // Either PrintConstInt or PrintInt
                   parameters: vec![
                     Instruction {
-                      inst_type: Type::Name(tokens[varname_index].token.clone()),
+                      inst_type: Type::Name(tokens_to_process[varname_index].token.clone()),
                       parameters: Vec::new(),
                     }
                   ]
                 };
-                instructions.push(instruction);
+                instructions_to_return.push(instruction);
               }
 
               Type::Str(str) | Type::ConstStr(str) => {
@@ -313,7 +313,7 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
                   inst_type: print_str_type, // Either PrintConstStr or PrintStr
                   parameters: vec![]
                 };
-                instructions.push(instruction);
+                instructions_to_return.push(instruction);
               }
 
               _ => {
@@ -330,23 +330,23 @@ pub fn generate_ir(tokens: Vec<Token>) -> Vec<Instruction> {
               inst_type: Type::PrintLn,
               parameters: Vec::new(),
             };
-            instructions.push(instruction);
+            instructions_to_return.push(instruction);
           }
         }
 
         // MARK: _ =>
         _ => {
-          print_error(ErrorCode::UnknownKeyword, tokens[0].clone(), "This token is not a supported instruction.")
+          print_error(ErrorCode::UnknownKeyword, tokens_to_process[0].clone(), "This token is not a supported instruction.")
         }
       }
       
       // end of loop here
       // delete all tokens before semicolon
       for _ in 0..index_of_semicolon+1 {
-        tokens.remove(0);
+        tokens_to_process.remove(0);
       }
     }
-    return instructions
+    return instructions_to_return
   }
 }
 
