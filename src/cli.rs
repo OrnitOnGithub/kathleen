@@ -7,19 +7,20 @@ use std::process;
 use crate::error;
 use crate::tokenizer::Token;
 
-pub const FILEPATH_ARG: usize = 1;
-const OUTPUTPATH_ARG: usize = 2;
-const EXTRA_ARGS: usize = 3;
+pub const FILEPATH_ARG_INDEX: usize = 1;
+const OUTPUTPATH_ARG_INDEX: usize = 2;
+const EXTRA_ARGS_INDEX: usize = 3;
 
 const LICENSE: &'static str = include_str!("../LICENSE");
 
-/// TODO: document
-pub fn handle_args() -> (String, String, bool, bool, bool) {
+/// Collects the command line arguments and returns the user's desired
+/// parameters in a `Parameter` struct.
+pub fn handle_args() -> Parameters {
 
   let args: Vec<String> = env::args().collect();
 
   // If there are no arguments
-  if args.len() < FILEPATH_ARG+1 {
+  if args.len() < FILEPATH_ARG_INDEX+1 {
     println!("{}", "Kathleen Programming Language Compiler\n".green());
     println!("{}", LICENSE);
     print_help()
@@ -30,11 +31,11 @@ pub fn handle_args() -> (String, String, bool, bool, bool) {
   }
 
   // Set source file (file_path) and output file (output_path) paths.
-  let file_path = &args[FILEPATH_ARG];
+  let file_path = &args[FILEPATH_ARG_INDEX];
   let mut output_path: &String =  &String::from("output"); // set a default
   // If there is a 2nd argument (output file name)
-  if args.len() >= OUTPUTPATH_ARG+1 {
-    output_path = &args[OUTPUTPATH_ARG];
+  if args.len() >= OUTPUTPATH_ARG_INDEX+1 {
+    output_path = &args[OUTPUTPATH_ARG_INDEX];
   }
 
   // If input file does not exist
@@ -61,7 +62,7 @@ pub fn handle_args() -> (String, String, bool, bool, bool) {
   let mut keep: bool = false;
 
   // If there are 3 or more args
-  if args.len() > EXTRA_ARGS {
+  if args.len() > EXTRA_ARGS_INDEX {
     for i in 3..args.len() {
       // Check for all extra arguments and set to true
       match args[i].as_str() {
@@ -84,9 +85,23 @@ pub fn handle_args() -> (String, String, bool, bool, bool) {
       }
     }
   }
+  return Parameters {
+    file_path:               file_path.to_string(),
+    output_path:             output_path.to_string(),
+    dont_assemble:           noasm,
+    dont_link:               nolink,
+    keep_intermediate_files: keep,
+  };
+}
 
-  return (file_path.to_string(), output_path.to_string(), noasm, nolink, keep);
-
+/// Struct that defines all possible parameters. Constructed by cli::handle_args.
+/// Contains all information that was given using command line arguments.
+pub struct Parameters {
+  pub file_path:               String,
+  pub output_path:             String,
+  pub dont_assemble:           bool,
+  pub dont_link:               bool,
+  pub keep_intermediate_files: bool,
 }
 
 /// This function shows a help menu with all possible
@@ -96,14 +111,14 @@ fn print_help() -> ! {
   // Maybe later put this in a formatted text file, this really sucks.
   println!("{}", "HELP".green());
   println!("{}", "---------".green());
-  println!("Usage: {}", "kathleen <arg1> <arg2> <other...".italic().green());
+  println!("Usage: {}", "kathleen <arg1> <arg2> [options]".italic().green());
   println!("Argument 1:");
   println!("    - {}", "path to file to compile");
   println!("    - {} {}", "help".green(), "Shows this help menu.");
   println!("Argument 2:");
   println!("    - {}", "name of output file");
   println!("    - {} {}", "if not provided, sets output file name to", "output".green());
-  println!("Other arguments:");
+  println!("Options:");
   println!("    - {} {}", "noasm".green(), "  Stop the compilation before it assembles the output file.");
   println!("    - {} {}", "nolink".green(), " Stop the compilation before it links the output file.");
   println!("    - {} {}", "keep".green(), "   Don't delete intermediate files (output.asm, output.o).");
