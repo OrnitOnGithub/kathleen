@@ -3,6 +3,7 @@ This is a temporary TODO that will be replaced later.
 - [x] Design an IR
 - [x] Fix the tokenizer to correctly build strings
   - [ ] ISSUE: if we have a variable called `something`, printing `"something"` would print the variable instead of the string `"something"`.
+    - Low priority
 - [ ] Get `let`, `const` and `print` to compile
   - [x] Keep track of all existing variables, for both static vs ref and error handling reasons
   - [ ] `let`
@@ -27,5 +28,5 @@ This is a temporary TODO that will be replaced later.
 - [ ] Add `fn` and `return`
 - [ ] Add `bool`s
 - [ ] Add `if` and `else` if I'm feeling generous
-- [ ] Add `loop` and `break`
+- [x] Add `loop` and `break`
 - [ ] Make release / package?
