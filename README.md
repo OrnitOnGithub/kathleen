@@ -23,7 +23,7 @@ There are no releases yet so to try this program you have to build it yourself.
 
 ### Run it
 
-(in these examples I will assume you added `<path/to/project>/target/debug` to your path PATH.)
+(in these examples I will assume you added `<path/to/project>/target/debug` to your path.)
 
 To display the help menu run
 ```sh
