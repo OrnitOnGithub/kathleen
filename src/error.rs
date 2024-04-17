@@ -3,7 +3,7 @@ use colored::*;
 
 use std::fs::read_to_string;
 use crate::tokenizer::Token;
-use crate::cli::FILEPATH_ARG;
+use crate::cli::FILEPATH_ARG_INDEX;
 use std::env;
 use std::process;
 
@@ -127,7 +127,7 @@ fn show_lines(token: Token) -> () {
 
   // get the file path
   let args: Vec<String> = env::args().collect();
-  let file_path = &args[FILEPATH_ARG];
+  let file_path = &args[FILEPATH_ARG_INDEX];
   
   let line: usize = token.line;
 
