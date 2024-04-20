@@ -100,7 +100,11 @@ fn main() {
       issue_during_assembling_or_linking = true;
     }
   }
-  if !parameters.dont_link && !parameters.dont_assemble{
+
+  // Link the object file
+  if !parameters.dont_link     &&
+     !parameters.dont_assemble
+  {
     // run the command `gcc -no-pie output.o -o output -g`
     let mut link = process::Command::new("gcc");
     link.arg("-no-pie").arg(obj_path).arg("-o").arg(parameters.output_path.clone()).arg("-g");
