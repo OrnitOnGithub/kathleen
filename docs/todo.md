@@ -1,32 +1,35 @@
-This is a temporary TODO that will be replaced later.
+TODO
 
-- [x] Design an IR
-- [x] Fix the tokenizer to correctly build strings
-  - [ ] ISSUE: if we have a variable called `something`, printing `"something"` would print the variable instead of the string `"something"`.
-    - Low priority
-- [ ] Get `let`, `const` and `print` to compile
-  - [x] Keep track of all existing variables, for both static vs ref and error handling reasons
-  - [ ] `let`
-    - [x] int
-    - [ ] str
-  - [ ] `const`
-    - [ ] int
-    - [x] str
-  - [ ] `print` and `println`
-    - [x] Print static strings
-    - [ ] Print dynamic strings
-    - [x] Print integers
-    - [ ] Print strings defined inside the print itself, like `print("Hello World!")`
-    - [x] Fix printing too many newlines issue
-- [ ] Synthax checker that finds ALL variable names and allows better handling of "referenced before assignment" error.
-- [x] Write a proper README
-- [x] Make errors look nicer, with colorize crate
-- [ ] Add something like token.is_string in the Token struct.
-- [ ] Clean up the IR generator. Seriously.
-- [ ] Add `drop`
-- [ ] Add mathematical operators
-- [ ] Add `fn` and `return`
-- [ ] Add `bool`s
-- [ ] Add `if` and `else` if I'm feeling generous
-- [x] Add `loop` and `break`
-- [ ] Make release / package?
+- [ ] Make tokenizer correctly build strings
+  - [x] Count everything between `"` as a single token
+  - [ ] [ISSUE] Strings and normal tokens kinda remain identical, so `"something"` is the same as `something`.
+- [ ] Variables
+  - [ ] Static integers
+  - [x] Constant strings
+  - [ ] Dynamic strings
+  - [ ] Vectors
+  - [ ] Static booleans
+  - [x] [UNWANTED] Dynamic integers
+- [ ] Printing
+  - [ ] Print all data types
+    - [ ] Static integers
+    - [x] Constant strings
+    - [ ] Dynamic strings
+    - [ ] Vectors
+    - [ ] Static booleans
+    - [x] [UNWANTED] Dynamic integers
+- [ ] Write a syntax checker
+- [ ] Clean up code
+  - [ ] Document
+  - [ ] Other improvements
+    - better variable naming
+    - maybe abstraction
+- [ ] More features
+  - [ ] Conditional jumps
+    - [ ] Booleans
+    - [ ] `if` and `else`
+  - [ ] Mathematical operators
+  - [ ] Functions
+    - [ ] Multiple file support
+      - [ ] Standard library
+  - [ ] Variable dropping
