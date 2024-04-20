@@ -4,3 +4,9 @@ IDEA 1: call create_instructions inside ir_generator once per function/loop/scop
 
 IDEA 2: Have the tokenizer (or an intermediate program) split scopes and have each scope compiled separately?
 
+
+data types
+- static integer
+- constant string
+- dynamic string
+- vector
