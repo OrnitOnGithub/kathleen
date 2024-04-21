@@ -7,6 +7,13 @@ IDEA 2: Have the tokenizer (or an intermediate program) split scopes and have ea
 
 data types
 - static integer
-- constant string
+- static string
 - dynamic string
 - vector
+- static booleans
+
+static x int
+static x str
+let    x str
+let    x vec<t>
+static x bool
