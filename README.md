@@ -19,7 +19,7 @@ There are no releases yet so to try this program you have to build it yourself.
 - Install NASM and GCC
 - Clone this repository
 - Run `cargo build`
-- You'll find the executable in `target/debug/katheen`.
+- You'll find the executable in `target/debug/kathleen`.
 
 ### Run it
 
