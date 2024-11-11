@@ -44,7 +44,7 @@ pub fn print_error(error_code: ErrorCode, token: Token, extra_info: &str) {
   println!();
   match error_code {
     ErrorCode::UnknownKeyword => {
-      println!("Unkown token {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
+      println!("Unknown token {} at line {}", token.token.italic(), (token.line+1).to_string().blue());
       show_lines(token);
       println!("Additional information: {}", colored_extra_info);
     }
